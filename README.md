@@ -91,5 +91,5 @@
 *****
 
 ## 🗂️ ERD
-![이미지 2024  5  19  오후 4 28](https://github.com/guswnee00/HospitalAppointmentProject/assets/124776145/0c3b6bbe-847a-48ae-9b22-68d800adb73f)
+![이미지 2024  5  19  오후 5 00](https://github.com/guswnee00/HospitalAppointmentProject/assets/124776145/0de0520d-ff0c-46f5-a1a5-8ae1c6b6e813)
 
