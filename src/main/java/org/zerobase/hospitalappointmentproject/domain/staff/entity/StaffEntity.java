@@ -26,10 +26,6 @@ public class StaffEntity extends UserEntity {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
-  private String name;
-  private String phoneNumber;
-  private String email;
-
   @ManyToOne
   @JoinColumn(name = "hospital_id")
   private HospitalEntity hospital;

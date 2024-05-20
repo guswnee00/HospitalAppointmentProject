@@ -28,11 +28,9 @@ public class PatientEntity extends UserEntity {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
-  private String name;
   private String gender;
   private LocalDate birthDate;
-  private String phoneNumber;
-  private String email;
+
   private String address;
 
   @OneToMany(mappedBy = "patient")

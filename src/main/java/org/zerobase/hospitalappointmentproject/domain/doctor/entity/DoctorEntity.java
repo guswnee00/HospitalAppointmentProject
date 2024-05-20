@@ -32,10 +32,6 @@ public class DoctorEntity extends UserEntity {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
-  private String name;
-  private String phoneNumber;
-  private String email;
-
   @Column(columnDefinition = "TEXT")
   private String bio;
 

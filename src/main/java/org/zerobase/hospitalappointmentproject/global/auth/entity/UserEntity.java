@@ -16,7 +16,11 @@ public class UserEntity {
 
   private String username;      // 로그인 아이디
   private String password;
-  private String role;
+  private String role;          // jwt 역할별 접근 제어
+
+  private String name;          // 실제 이름
+  private String phoneNumber;
+  private String email;
 
   @CreatedDate
   @Column(updatable = false)
