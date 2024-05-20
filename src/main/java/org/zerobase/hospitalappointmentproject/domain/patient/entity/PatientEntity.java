@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 import org.zerobase.hospitalappointmentproject.domain.appointment.entity.AppointmentEntity;
 import org.zerobase.hospitalappointmentproject.domain.medicalrecord.entity.MedicalRecordEntity;
-import org.zerobase.hospitalappointmentproject.global.common.BaseEntity;
+import org.zerobase.hospitalappointmentproject.global.auth.entity.UserEntity;
 
 @Builder
 @Getter
@@ -22,17 +22,13 @@ import org.zerobase.hospitalappointmentproject.global.common.BaseEntity;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity(name = "Patient")
-public class PatientEntity extends BaseEntity {
+public class PatientEntity extends UserEntity {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
-  private String username;      // 로그인 아이디
-  private String password;
-  private String role;
-
-  private String name;          // 실제 이름
+  private String name;
   private String gender;
   private LocalDate birthDate;
   private String phoneNumber;

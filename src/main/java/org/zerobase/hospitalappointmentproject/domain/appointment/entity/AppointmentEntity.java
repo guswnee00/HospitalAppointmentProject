@@ -1,6 +1,8 @@
 package org.zerobase.hospitalappointmentproject.domain.appointment.entity;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EntityListeners;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
@@ -14,19 +16,22 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import org.zerobase.hospitalappointmentproject.domain.doctor.entity.DoctorEntity;
 import org.zerobase.hospitalappointmentproject.domain.hospital.entity.HospitalEntity;
 import org.zerobase.hospitalappointmentproject.domain.patient.entity.PatientEntity;
-import org.zerobase.hospitalappointmentproject.global.common.AppointmentStatus;
-import org.zerobase.hospitalappointmentproject.global.common.BaseEntity;
+import org.zerobase.hospitalappointmentproject.global.common.enumset.AppointmentStatus;
 
 @Builder
 @Getter
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
+@EntityListeners(AuditingEntityListener.class)
 @Entity(name = "Appointment")
-public class AppointmentEntity extends BaseEntity {
+public class AppointmentEntity {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -36,6 +41,13 @@ public class AppointmentEntity extends BaseEntity {
 
   @Enumerated(EnumType.STRING)
   private AppointmentStatus status;
+
+  @CreatedDate
+  @Column(updatable = false)
+  private LocalDateTime createdAt;
+
+  @LastModifiedDate
+  private LocalDateTime modifiedAt;
 
   @ManyToOne
   @JoinColumn(name = "patient_id")
