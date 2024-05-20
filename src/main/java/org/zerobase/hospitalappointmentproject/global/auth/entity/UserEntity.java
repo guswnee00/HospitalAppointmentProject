@@ -1,4 +1,4 @@
-package org.zerobase.hospitalappointmentproject.global.common;
+package org.zerobase.hospitalappointmentproject.global.auth.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.EntityListeners;
@@ -12,7 +12,11 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @Getter
 @MappedSuperclass
 @EntityListeners(AuditingEntityListener.class)
-public class BaseEntity {
+public class UserEntity {
+
+  private String username;      // 로그인 아이디
+  private String password;
+  private String role;
 
   @CreatedDate
   @Column(updatable = false)
