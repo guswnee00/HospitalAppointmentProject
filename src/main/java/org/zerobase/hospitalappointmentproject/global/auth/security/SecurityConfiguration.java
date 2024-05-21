@@ -13,7 +13,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
@@ -50,7 +49,8 @@ public class SecurityConfiguration {
 
     // 경로별 인가 작업
     http.authorizeHttpRequests((auth) -> auth
-        .requestMatchers("/**").permitAll()
+        .requestMatchers("/", "/signup/**", "/login/**").permitAll()    // 회원가입, 로그인 모두 허용
+        .requestMatchers("/swagger-ui.html", "/v1/api-docs/**", "/swagger-ui/**", "/swagger-resources/**").permitAll()    // swagger
 //        .requestMatchers("").hasRole("PATIENT")
 //        .requestMatchers("").hasRole("DOCTOR")
 //        .requestMatchers("").hasRole("STAFF")
