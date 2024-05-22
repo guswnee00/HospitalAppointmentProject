@@ -1,5 +1,9 @@
 package org.zerobase.hospitalappointmentproject.domain.doctor.service;
 
+import static org.zerobase.hospitalappointmentproject.global.exception.ErrorCode.INVALID_PASSWORD;
+import static org.zerobase.hospitalappointmentproject.global.exception.ErrorCode.TWO_PASSWORDS_DO_NOT_MATCH;
+import static org.zerobase.hospitalappointmentproject.global.exception.ErrorCode.USERNAME_ALREADY_IN_USE;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -12,7 +16,6 @@ import org.zerobase.hospitalappointmentproject.domain.hospital.repository.Hospit
 import org.zerobase.hospitalappointmentproject.domain.specialty.repository.SpecialtyRepository;
 import org.zerobase.hospitalappointmentproject.global.auth.service.UserValidationService;
 import org.zerobase.hospitalappointmentproject.global.exception.CustomException;
-import org.zerobase.hospitalappointmentproject.global.exception.ErrorCode;
 import org.zerobase.hospitalappointmentproject.global.util.PasswordUtils;
 
 @Service
@@ -40,15 +43,15 @@ public class DoctorService {
   public DoctorDto signup(DoctorSignup.Request request) {
 
     if (userValidationService.isUsernameUsed(request.getUsername())) {
-      throw new CustomException(ErrorCode.USERNAME_ALREADY_IN_USE);
+      throw new CustomException(USERNAME_ALREADY_IN_USE);
     }
 
     if (!PasswordUtils.equalPassword(request.getPassword(), request.getCheckingPassword())) {
-      throw new CustomException(ErrorCode.TWO_PASSWORDS_DO_NOT_MATCH);
+      throw new CustomException(TWO_PASSWORDS_DO_NOT_MATCH);
     }
 
     if (!PasswordUtils.validationPassword(request.getPassword())) {
-      throw new CustomException(ErrorCode.INVALID_PASSWORD);
+      throw new CustomException(INVALID_PASSWORD);
     }
 
     request.setPassword(bCryptPasswordEncoder.encode(request.getPassword()));
