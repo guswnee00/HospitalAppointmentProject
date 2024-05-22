@@ -73,6 +73,7 @@ public class PatientSignup {
     private LocalDateTime createdAt;
 
     public static Response fromDto(PatientDto dto) {
+
       return Response.builder()
           .username(dto.getUsername())
           .name(dto.getName())
@@ -83,6 +84,7 @@ public class PatientSignup {
           .address(dto.getAddress())
           .createdAt(dto.getCreatedAt())
           .build();
+
     }
 
   }

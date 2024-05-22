@@ -30,6 +30,7 @@ public class PatientService {
    *        b. password util 을 통해 유효한 비밀번호인지 확인
    *    3. 비밀번호 encode
    *    4. 환자 정보 저장
+   *    5. dto 반환
    */
 
   public PatientDto signup(PatientSignup.Request request) {
@@ -51,6 +52,7 @@ public class PatientService {
     PatientEntity patient = patientRepository.save(PatientSignup.Request.toEntity(request));
 
     return patientMapper.toDto(patient);
+
   }
 
   /**
