@@ -10,6 +10,7 @@ import org.zerobase.hospitalappointmentproject.domain.doctor.entity.DoctorEntity
 import org.zerobase.hospitalappointmentproject.domain.doctor.repository.DoctorRepository;
 import org.zerobase.hospitalappointmentproject.domain.patient.entity.PatientEntity;
 import org.zerobase.hospitalappointmentproject.domain.patient.repository.PatientRepository;
+import org.zerobase.hospitalappointmentproject.domain.staff.entity.StaffEntity;
 import org.zerobase.hospitalappointmentproject.domain.staff.repository.StaffRepository;
 import org.zerobase.hospitalappointmentproject.global.auth.dto.LoginDto;
 import org.zerobase.hospitalappointmentproject.global.exception.CustomException;
@@ -58,6 +59,22 @@ public class LoginService {
     }
 
     return doctor;
+
+  }
+
+  public StaffEntity staffLogin(LoginDto loginDto) {
+
+    StaffEntity staff = staffRepository.findByUsername(loginDto.getUsername());
+
+    if (staff == null) {
+      throw new CustomException(USERNAME_DOES_NOT_EXIST);
+    }
+
+    if (!bCryptPasswordEncoder.matches(loginDto.getPassword(), staff.getPassword())) {
+      throw new CustomException(PASSWORD_DOES_NOT_MATCH);
+    }
+
+    return staff;
 
   }
 

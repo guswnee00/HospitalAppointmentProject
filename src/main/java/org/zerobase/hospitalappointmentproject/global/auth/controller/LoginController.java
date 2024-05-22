@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.zerobase.hospitalappointmentproject.domain.doctor.entity.DoctorEntity;
 import org.zerobase.hospitalappointmentproject.domain.patient.entity.PatientEntity;
+import org.zerobase.hospitalappointmentproject.domain.staff.entity.StaffEntity;
 import org.zerobase.hospitalappointmentproject.global.auth.dto.LoginDto;
 import org.zerobase.hospitalappointmentproject.global.auth.dto.LoginResponse;
 import org.zerobase.hospitalappointmentproject.global.auth.security.JwtUtil;
@@ -42,6 +43,17 @@ public class LoginController {
     String token = jwtUtil.createJwt(doctor.getUsername(), doctor.getRole(), expiredTime);
 
     return ResponseEntity.ok(new LoginResponse(doctor.getUsername(), token));
+
+  }
+
+  @PostMapping("/login/staff")
+  public ResponseEntity<?> staffLogin(@RequestBody LoginDto loginDto) {
+
+    StaffEntity staff = loginService.staffLogin(loginDto);
+
+    String token = jwtUtil.createJwt(staff.getUsername(), staff.getRole(), expiredTime);
+
+    return ResponseEntity.ok(new LoginResponse(staff.getUsername(), token));
 
   }
 
