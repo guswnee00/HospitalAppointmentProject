@@ -11,16 +11,17 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import java.util.Set;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import lombok.experimental.SuperBuilder;
 import org.zerobase.hospitalappointmentproject.domain.appointment.entity.AppointmentEntity;
 import org.zerobase.hospitalappointmentproject.domain.hospital.entity.HospitalEntity;
 import org.zerobase.hospitalappointmentproject.domain.medicalrecord.entity.MedicalRecordEntity;
+import org.zerobase.hospitalappointmentproject.domain.specialty.entity.SpecialtyEntity;
 import org.zerobase.hospitalappointmentproject.global.auth.entity.UserEntity;
 
-@Builder
+@SuperBuilder
 @Getter
 @ToString
 @NoArgsConstructor
