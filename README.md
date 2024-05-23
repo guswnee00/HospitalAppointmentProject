@@ -58,7 +58,7 @@
 ### 환자
 #### 회원가입 및 로그인
 - 회원가입 : `signup/patient`
-- 로그인 : `signin/patient`
+- 로그인 : `login/patient`
 #### 개인 정보
 - 조회 / 수정 / 삭제 : `/patient/{patientId}`
 #### 예약 정보
@@ -71,7 +71,7 @@
 ### 의사
 #### 회원가입 및 로그인
 - 회원가입 : `signup/doctor`
-- 로그인 : `signin/doctor`
+- 로그인 : `login/doctor`
 #### 개인 정보
 - 조회 / 수정 / 삭제 : `/doctor/{doctorId}`
 #### 진료 기록
@@ -82,7 +82,7 @@
 ### 병원 관계자
 #### 회원가입 및 로그인
 - 회원가입 : `signup/staff`
-- 로그인 : `signin/staff`
+- 로그인 : `login/staff`
 #### 개인 정보
 - 조회 / 수정 / 삭제 : `/staff/{staffId}`
 #### 예약 정보
@@ -91,5 +91,4 @@
 *****
 
 ## 🗂️ ERD
-![이미지 2024  5  19  오후 5 33](https://github.com/guswnee00/HospitalAppointmentProject/assets/124776145/35d4fd5d-6961-4f48-8ef0-a2fadec3153f)
-
+![ERD](https://github.com/guswnee00/HospitalAppointmentProject/assets/124776145/5a0f8e4d-3ac6-46c3-9443-df23d0b8ca7c)
