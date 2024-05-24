@@ -38,9 +38,10 @@ class LoginServiceTest {
     loginDto.setUsername("testUsername");
     loginDto.setPassword("testPassword");
 
-    patientEntity = new PatientEntity();
-    patientEntity.setUsername("testUsername");
-    patientEntity.setPassword("$2a$10$DOWSDu7lH8/ZZ7K8oSkR.e5ECIU/8oeHZV5bQf1Jhzl/3fBzC9q2K");
+    patientEntity = PatientEntity.builder()
+        .username("testUsername")
+        .password("$2a$10$DOWSDu7lH8/ZZ7K8oSkR.e5ECIU/8oeHZV5bQf1Jhzl/3fBzC9q2K").build();
+
   }
 
   @Test
