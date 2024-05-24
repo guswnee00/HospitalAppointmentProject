@@ -8,10 +8,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.zerobase.hospitalappointmentproject.domain.hospital.entity.HospitalEntity;
 import org.zerobase.hospitalappointmentproject.domain.staff.dto.StaffDto;
 import org.zerobase.hospitalappointmentproject.domain.staff.dto.StaffSignup;
 import org.zerobase.hospitalappointmentproject.domain.staff.entity.StaffEntity;
+import org.zerobase.hospitalappointmentproject.domain.staff.mapper.CustomStaffMapper;
 import org.zerobase.hospitalappointmentproject.domain.staff.mapper.StaffMapper;
 import org.zerobase.hospitalappointmentproject.domain.staff.repository.StaffRepository;
 import org.zerobase.hospitalappointmentproject.global.auth.service.UserValidationService;
@@ -25,6 +25,7 @@ public class StaffService {
 
   private final StaffRepository staffRepository;
   private final StaffMapper staffMapper;
+  private final CustomStaffMapper customStaffMapper;
   private final UserValidationService userValidationService;
   private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
@@ -76,21 +77,7 @@ public class StaffService {
 
     StaffEntity staff = staffRepository.findByUsername(username);
 
-    if (staff.getHospital() == null) {
-      HospitalEntity tmpHospital = HospitalEntity.builder().name("null").build();
-
-      StaffEntity tempStaff = StaffEntity.builder()
-                                        .username(staff.getUsername())
-                                        .name(staff.getName())
-                                        .phoneNumber(staff.getPhoneNumber())
-                                        .email(staff.getEmail())
-                                        .hospital(tmpHospital)
-                                        .build();
-
-      return staffMapper.toDto(tempStaff);
-    }
-
-    return staffMapper.toDto(staff);
+    return customStaffMapper.toDto(staff);
 
   }
 
@@ -116,6 +103,29 @@ public class StaffService {
 
   // TODO
   //  - 병원 관계자의 병원 등록, 수정, 삭제
+
+  /**
+   * 병원 관계자의 병원 등록
+   *    1. 아이디로 엔티티 가져오기
+   *        A. staff.getHospital() != null (이미 병원 등록)
+   *            a. CustomException 발생 -> 이미 병원이 등록된 상태입니다.
+   *        B. 병원 등록이 안되어 있다면 병원 등록 진행
+   *            a. 동일한 병원 이름이 있다면
+   *                i. CustomException 발생 -> 동일한 병원 이름이 존재합니다.
+   *            b. 동일한 병원 이름이 없다면 등록
+   *    2. dto 반환
+   *
+   *    public HospitalDto registerHospital(String username, RegisterHospital.Request request) {
+   *
+   *     StaffEntity staff = staffRepository.findByUsername(username);
+   *     if (staff.getHospital() != null) {
+   *       throw new
+   *     }
+   *
+   *   }
+   *
+   */
+
 
 
 
