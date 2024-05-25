@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -14,6 +15,7 @@ import org.zerobase.hospitalappointmentproject.domain.doctor.dto.DoctorInfoRespo
 import org.zerobase.hospitalappointmentproject.domain.doctor.dto.DoctorInfoUpdate;
 import org.zerobase.hospitalappointmentproject.domain.doctor.dto.DoctorSignup;
 import org.zerobase.hospitalappointmentproject.domain.doctor.service.DoctorService;
+import org.zerobase.hospitalappointmentproject.global.auth.dto.PasswordRequest;
 
 @RestController
 @RequiredArgsConstructor
@@ -34,7 +36,7 @@ public class DoctorController {
     return ResponseEntity.ok(DoctorInfoResponse.fromDto(doctorDto));
   }
 
-  @PatchMapping("/doctor/update-info")
+  @PatchMapping("/doctor/my-info")
   public ResponseEntity<?> updateInfo(@AuthenticationPrincipal UserDetails userDetails,
                                       @RequestBody DoctorInfoUpdate.Request request
   ) {
@@ -42,5 +44,12 @@ public class DoctorController {
     DoctorDto doctorDto = doctorService.updateInfo(username, request);
     return ResponseEntity.ok(DoctorInfoUpdate.Response.fromDto(doctorDto));
   }
+
+  @DeleteMapping("/doctor/my-info")
+  public void deleteInfo(@AuthenticationPrincipal UserDetails userDetails, @RequestBody PasswordRequest request) {
+    String username = userDetails.getUsername();
+    doctorService.deleteInfo(username, request.getPassword());
+  }
+
 
 }
