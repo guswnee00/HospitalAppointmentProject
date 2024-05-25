@@ -6,9 +6,14 @@
 *****
 
 ## ⚙️ 개발 환경
-- Java 17, SpringBoot 3.2.5, gradle 8.7
-- Spring data JPA, Spring Security(JWT)
+- Java 17
+- SpringBoot 3.2.5
+- gradle 8.7
+- Spring data JPA
+- Spring Security(JWT)
 - MySQL
+- Junit
+- Mockito
 - IntelliJ Idea
 *****
 
@@ -31,8 +36,9 @@
 - 의사는 작성했던 모든 진료 기록을 조회 / 수정할 수 있다.
 
 ### 병원 관계자 Staff
-- 병원 관계자는 본인의 개인 정보를 조회 / 수정 / 삭제할 수 있다.
-- 병원 관리자는 담당 병원을 등록할 수 있다.
+- 병원 관계자는 본인의 개인 정보를 조회 / 수정할 수 있다.
+  - 병원 관계자가 병원을 관두는 경우 아이디는 삭제하지 않고 후임 관계자의 정보로 수정한 뒤 사용
+- 병원 관리자는 자신의 병원을 등록할 수 있다.
 - 병원 관리자는 담당 병원에 대해 모든 예약을 조회하고 예약 상태를 변경할 수 있다.
   - 예약을 확인한 후 **예약대기** 상태에서 **예약확정** 상태로 변경
 
@@ -60,31 +66,35 @@
 - 회원가입 : `signup/patient`
 - 로그인 : `login/patient`
 #### 개인 정보
-- 조회 / 수정 / 삭제 : `/patient/{patientId}`
+- 조회 : `/patient/my-info`
+- 수정 : `/patient/update-info`
+- 삭제 : `/patient/delete-info`
 #### 예약 정보
 - 조회 / 수정 / 삭제 : `/patient/appointment/{patientId}`
 #### 진료 기록
-- 진료 기록 작성 : 
-- 진료 기록 조회 : 
-- 진료 기록 수정 : 
+- 진료 기록 조회 :  
 
 ### 의사
 #### 회원가입 및 로그인
 - 회원가입 : `signup/doctor`
 - 로그인 : `login/doctor`
 #### 개인 정보
-- 조회 / 수정 / 삭제 : `/doctor/{doctorId}`
+- 조회 : `/doctor/my-info`
+- 수정  : `/doctor/update-info`
+- 삭제 : `/doctor/delete-info`
 #### 진료 기록
-- 진료 기록 작성 : 
-- 진료 기록 조회 : 
-- 진료 기록 수정 : 
+- 진료 기록 작성 :
+- 진료 기록 조회 :
+- 진료 기록 수정 :
 
 ### 병원 관계자
 #### 회원가입 및 로그인
 - 회원가입 : `signup/staff`
 - 로그인 : `login/staff`
 #### 개인 정보
-- 조회 / 수정 / 삭제 : `/staff/{staffId}`
+- 조회 : `/staff/my-info`
+- 수정 : `/staff/update-info`
+
 #### 예약 정보
 - 예약 정보 조회 : 
 - 예약 확정 : 
