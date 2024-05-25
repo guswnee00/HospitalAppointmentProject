@@ -1,13 +1,18 @@
 package org.zerobase.hospitalappointmentproject.domain.doctor.service;
 
+import static org.zerobase.hospitalappointmentproject.global.exception.ErrorCode.CURRENT_PASSWORD_DOES_NOT_MATCH;
 import static org.zerobase.hospitalappointmentproject.global.exception.ErrorCode.INVALID_PASSWORD;
+import static org.zerobase.hospitalappointmentproject.global.exception.ErrorCode.NEW_PASSWORD_MUST_BE_DIFFERENT_FROM_CURRENT_ONE;
+import static org.zerobase.hospitalappointmentproject.global.exception.ErrorCode.PASSWORD_IS_REQUIRED_TO_UPDATE_INFO;
 import static org.zerobase.hospitalappointmentproject.global.exception.ErrorCode.TWO_PASSWORDS_DO_NOT_MATCH;
 import static org.zerobase.hospitalappointmentproject.global.exception.ErrorCode.USERNAME_ALREADY_IN_USE;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.zerobase.hospitalappointmentproject.domain.doctor.dto.DoctorDto;
+import org.zerobase.hospitalappointmentproject.domain.doctor.dto.DoctorInfoUpdate;
 import org.zerobase.hospitalappointmentproject.domain.doctor.dto.DoctorSignup;
 import org.zerobase.hospitalappointmentproject.domain.doctor.entity.DoctorEntity;
 import org.zerobase.hospitalappointmentproject.domain.doctor.mapper.DoctorMapper;
@@ -81,6 +86,37 @@ public class DoctorService {
   /**
    * 의사의 개인 정보 수정
    */
+  @Transactional
+  public DoctorDto updateInfo(String username, DoctorInfoUpdate.Request request) {
+
+    DoctorEntity doctor = doctorRepository.findByUsername(username);
+
+    if (request.getCurrentPassword() != null) {
+      if (!bCryptPasswordEncoder.matches(request.getCurrentPassword(), doctor.getPassword())) {
+        throw new CustomException(CURRENT_PASSWORD_DOES_NOT_MATCH);
+      } else {
+        throw new CustomException(PASSWORD_IS_REQUIRED_TO_UPDATE_INFO);
+      }
+    }
+    if (request.getNewPassword() != null) {
+      if (!bCryptPasswordEncoder.matches(request.getNewPassword(), doctor.getPassword())) {
+        throw new CustomException(NEW_PASSWORD_MUST_BE_DIFFERENT_FROM_CURRENT_ONE);
+      }
+      if (!PasswordUtils.validationPassword(request.getNewPassword())) {
+        throw new CustomException(INVALID_PASSWORD);
+      }
+
+      doctor = doctor.toBuilder()
+                    .password(bCryptPasswordEncoder.encode(request.getNewPassword()))
+                    .build();
+
+    }
+
+    DoctorEntity updateEntity = doctorRepository.save(request.toUpdateEntity(doctor));
+
+    return doctorMapper.toDto(updateEntity);
+
+  }
 
   /**
    * 의사의 개인 정보 삭제
