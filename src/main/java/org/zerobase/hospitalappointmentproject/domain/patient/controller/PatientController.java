@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -14,6 +15,7 @@ import org.zerobase.hospitalappointmentproject.domain.patient.dto.PatientInfoRes
 import org.zerobase.hospitalappointmentproject.domain.patient.dto.PatientInfoUpdate;
 import org.zerobase.hospitalappointmentproject.domain.patient.dto.PatientSignup;
 import org.zerobase.hospitalappointmentproject.domain.patient.service.PatientService;
+import org.zerobase.hospitalappointmentproject.global.auth.dto.PasswordRequest;
 
 @RestController
 @RequiredArgsConstructor
@@ -44,4 +46,14 @@ public class PatientController {
     return ResponseEntity.ok(PatientInfoUpdate.Response.fromDto(patientDto));
 
   }
+
+  @DeleteMapping("/patient/my-info")
+  public ResponseEntity<?> deleteInfo(@AuthenticationPrincipal UserDetails userDetails,
+                                      @RequestBody PasswordRequest request
+  ) {
+    String username = userDetails.getUsername();
+    patientService.deleteInfo(username, request.getPassword());
+    return ResponseEntity.ok("개인 정보 삭제가 완료되었습니다.");
+  }
+
 }

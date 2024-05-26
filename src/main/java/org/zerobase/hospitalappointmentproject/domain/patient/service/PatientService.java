@@ -3,6 +3,7 @@ package org.zerobase.hospitalappointmentproject.domain.patient.service;
 import static org.zerobase.hospitalappointmentproject.global.exception.ErrorCode.CURRENT_PASSWORD_DOES_NOT_MATCH;
 import static org.zerobase.hospitalappointmentproject.global.exception.ErrorCode.INVALID_PASSWORD;
 import static org.zerobase.hospitalappointmentproject.global.exception.ErrorCode.NEW_PASSWORD_MUST_BE_DIFFERENT_FROM_CURRENT_ONE;
+import static org.zerobase.hospitalappointmentproject.global.exception.ErrorCode.PASSWORD_DOES_NOT_MATCH;
 import static org.zerobase.hospitalappointmentproject.global.exception.ErrorCode.PASSWORD_IS_REQUIRED_TO_UPDATE_INFO;
 import static org.zerobase.hospitalappointmentproject.global.exception.ErrorCode.TWO_PASSWORDS_DO_NOT_MATCH;
 import static org.zerobase.hospitalappointmentproject.global.exception.ErrorCode.USERNAME_ALREADY_IN_USE;
@@ -125,6 +126,21 @@ public class PatientService {
 
   /**
    * 환자의 개인 정보 삭제
+   *    1. 아이디로 엔티티 가져오기
+   *    2. 비밀번호를 입력했는지 일치하는지 확인
+   *    3. 엔티티 삭제
    */
+  @Transactional
+  public void deleteInfo(String username, String password) {
+
+    PatientEntity patient = patientRepository.findByUsername(username);
+
+    if (password == null || !bCryptPasswordEncoder.matches(password, patient.getPassword())) {
+      throw new CustomException(PASSWORD_DOES_NOT_MATCH);
+    }
+
+    patientRepository.delete(patient);
+
+  }
 
 }
