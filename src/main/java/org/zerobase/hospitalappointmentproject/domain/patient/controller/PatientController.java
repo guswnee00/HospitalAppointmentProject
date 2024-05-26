@@ -5,11 +5,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.zerobase.hospitalappointmentproject.domain.patient.dto.PatientDto;
 import org.zerobase.hospitalappointmentproject.domain.patient.dto.PatientInfoResponse;
+import org.zerobase.hospitalappointmentproject.domain.patient.dto.PatientInfoUpdate;
 import org.zerobase.hospitalappointmentproject.domain.patient.dto.PatientSignup;
 import org.zerobase.hospitalappointmentproject.domain.patient.service.PatientService;
 
@@ -33,4 +35,13 @@ public class PatientController {
     return ResponseEntity.ok(PatientInfoResponse.fromDto(patientDto));
   }
 
+  @PatchMapping("/patient/my-info")
+  public ResponseEntity<?> updateInfo(@AuthenticationPrincipal UserDetails userDetails,
+                                      @RequestBody PatientInfoUpdate.Request request
+  ) {
+    String username = userDetails.getUsername();
+    PatientDto patientDto = patientService.updateInfo(username, request);
+    return ResponseEntity.ok(PatientInfoUpdate.Response.fromDto(patientDto));
+
+  }
 }
