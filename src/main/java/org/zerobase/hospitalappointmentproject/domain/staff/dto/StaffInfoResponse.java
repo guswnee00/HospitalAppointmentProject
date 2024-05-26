@@ -22,6 +22,7 @@ public class StaffInfoResponse {
   private String hospitalName;
 
   public static StaffInfoResponse fromDto(StaffDto dto) {
+
     return StaffInfoResponse.builder()
         .username(dto.getUsername())
         .name(dto.getName())

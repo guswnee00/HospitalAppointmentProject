@@ -14,6 +14,7 @@ public class StaffSignup {
   @Getter
   @Setter
   @AllArgsConstructor
+  @NoArgsConstructor
   public static class Request {
 
     private String username;

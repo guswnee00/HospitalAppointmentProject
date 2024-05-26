@@ -59,6 +59,7 @@ public class StaffInfoUpdate {
     private LocalDateTime modifiedAt;
 
     public static Response fromDto(StaffDto dto) {
+
       return Response.builder()
           .name(dto.getName())
           .phoneNumber(dto.getPhoneNumber())
