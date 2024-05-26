@@ -46,10 +46,12 @@ public class DoctorController {
   }
 
   @DeleteMapping("/doctor/my-info")
-  public void deleteInfo(@AuthenticationPrincipal UserDetails userDetails, @RequestBody PasswordRequest request) {
+  public ResponseEntity<?> deleteInfo(@AuthenticationPrincipal UserDetails userDetails,
+                                      @RequestBody PasswordRequest request
+  ) {
     String username = userDetails.getUsername();
     doctorService.deleteInfo(username, request.getPassword());
+    return ResponseEntity.ok("개인 정보 삭제가 완료되었습니다.");
   }
-
 
 }
