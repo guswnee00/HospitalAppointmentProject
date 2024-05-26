@@ -44,6 +44,7 @@ public class StaffService {
    *    4. 병원 관계자 정보 저장
    *    5. dto 반환
    */
+  @Transactional
   public StaffDto signup(StaffSignup.Request request) {
 
     if (userValidationService.isUsernameUsed(request.getUsername())) {
@@ -66,14 +67,12 @@ public class StaffService {
 
   }
 
-  // TODO
-  //  - 개인 정보 조회, 수정, 삭제
-
   /**
    * 병원 관계자의 개인 정보 조회
    *    1. 아이디로 엔티티 가져오기
    *    2. mapper 를 이용해 dto 반환
    */
+  @Transactional
   public StaffDto getInfo(String username) {
 
     StaffEntity staff = staffRepository.findByUsername(username);
@@ -99,22 +98,28 @@ public class StaffService {
     StaffEntity staff = staffRepository.findByUsername(username);
 
     if (request.getCurrentPassword() != null) {
+
       if (!bCryptPasswordEncoder.matches(request.getCurrentPassword(), staff.getPassword())) {
         throw new CustomException(CURRENT_PASSWORD_DOES_NOT_MATCH);
       } else {
         throw new CustomException(PASSWORD_IS_REQUIRED_TO_UPDATE_INFO);
       }
     }
+
     if (request.getNewPassword() != null) {
+
       if (bCryptPasswordEncoder.matches(request.getNewPassword(), staff.getPassword())) {
         throw new CustomException(NEW_PASSWORD_MUST_BE_DIFFERENT_FROM_CURRENT_ONE);
       }
+
       if (!PasswordUtils.validationPassword(request.getNewPassword())) {
         throw new CustomException(INVALID_PASSWORD);
       }
+
       staff = staff.toBuilder()
                   .password(bCryptPasswordEncoder.encode(request.getNewPassword()))
                   .build();
+
     }
 
     StaffEntity updateEntity = staffRepository.save(request.toUpdateEntity(staff));
@@ -123,20 +128,8 @@ public class StaffService {
 
   }
 
-
-  /*
-    병원 관계자의 개인 정보 삭제
-
-    public StaffDto deleteInfo() {
-
-      }
-
-   */
-
-
   // TODO
   //  - 병원 관계자의 병원 등록, 수정, 삭제
-
 
   /**
    * 병원 관계자의 병원 등록

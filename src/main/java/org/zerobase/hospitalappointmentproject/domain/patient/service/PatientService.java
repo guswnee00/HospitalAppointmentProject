@@ -64,9 +64,6 @@ public class PatientService {
 
   }
 
-  // TODO
-  //  - 개인 정보 조회, 수정, 삭제
-
   /**
    * 환자의 개인 정보 조회
    *    1. 아이디로 엔티티 가져오기
