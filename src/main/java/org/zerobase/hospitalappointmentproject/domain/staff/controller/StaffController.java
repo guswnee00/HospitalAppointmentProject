@@ -34,7 +34,7 @@ public class StaffController {
     return ResponseEntity.ok(StaffInfoResponse.fromDto(staffDto));
   }
 
-  @PatchMapping("/staff/update-info")
+  @PatchMapping("/staff/my-info")
   public ResponseEntity<?> updateInfo(@AuthenticationPrincipal UserDetails userDetails,
                                       @RequestBody StaffInfoUpdate.Request request
   ) {
