@@ -16,6 +16,7 @@ public class PatientSignup {
   @Getter
   @Setter
   @AllArgsConstructor
+  @NoArgsConstructor
   public static class Request {
 
     private String username;
