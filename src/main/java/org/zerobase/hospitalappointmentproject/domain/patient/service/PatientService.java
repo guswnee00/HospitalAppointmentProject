@@ -3,6 +3,7 @@ package org.zerobase.hospitalappointmentproject.domain.patient.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.zerobase.hospitalappointmentproject.domain.patient.dto.PatientDto;
 import org.zerobase.hospitalappointmentproject.domain.patient.dto.PatientSignup;
 import org.zerobase.hospitalappointmentproject.domain.patient.entity.PatientEntity;
@@ -55,9 +56,20 @@ public class PatientService {
 
   }
 
+  // TODO
+  //  - 개인 정보 조회, 수정, 삭제
+
   /**
    * 환자의 개인 정보 조회
    */
+  @Transactional
+  public PatientDto getInfo(String username) {
+
+    PatientEntity patient = patientRepository.findByUsername(username);
+
+    return patientMapper.toDto(patient);
+
+  }
 
   /**
    * 환자의 개인 정보 수정
