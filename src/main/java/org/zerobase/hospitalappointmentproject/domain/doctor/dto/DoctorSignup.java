@@ -9,9 +9,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.zerobase.hospitalappointmentproject.domain.doctor.entity.DoctorEntity;
-import org.zerobase.hospitalappointmentproject.domain.specialty.entity.SpecialtyEntity;
 import org.zerobase.hospitalappointmentproject.domain.hospital.entity.HospitalEntity;
 import org.zerobase.hospitalappointmentproject.domain.hospital.repository.HospitalRepository;
+import org.zerobase.hospitalappointmentproject.domain.specialty.entity.SpecialtyEntity;
 import org.zerobase.hospitalappointmentproject.domain.specialty.repository.SpecialtyRepository;
 import org.zerobase.hospitalappointmentproject.global.common.PersonRole;
 import org.zerobase.hospitalappointmentproject.global.exception.CustomException;
@@ -21,6 +21,7 @@ public class DoctorSignup {
   @Getter
   @Setter
   @AllArgsConstructor
+  @NoArgsConstructor
   public static class Request {
 
     private String username;

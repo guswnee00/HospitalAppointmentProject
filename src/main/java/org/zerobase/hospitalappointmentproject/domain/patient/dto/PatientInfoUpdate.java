@@ -9,9 +9,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.zerobase.hospitalappointmentproject.domain.patient.entity.PatientEntity;
 import org.zerobase.hospitalappointmentproject.global.common.GenderType;
-import org.zerobase.hospitalappointmentproject.global.common.PersonRole;
 
-public class PatientSignup {
+public class PatientInfoUpdate {
 
   @Getter
   @Setter
@@ -19,9 +18,8 @@ public class PatientSignup {
   @NoArgsConstructor
   public static class Request {
 
-    private String username;
-    private String password;
-    private String checkingPassword;
+    private String currentPassword;
+    private String newPassword;
 
     private String name;
     private String phoneNumber;
@@ -30,25 +28,42 @@ public class PatientSignup {
     private String gender;
     private String address;
 
-    private int birthYear;
-    private int birthMonth;
-    private int birthDay;
+    private Integer birthYear;
+    private Integer birthMonth;
+    private Integer birthDay;
 
-    public static PatientEntity toEntity(Request request) {
+    public PatientEntity toUpdateEntity(PatientEntity entity) {
 
-      return PatientEntity.builder()
-          .username(request.getUsername())
-          .password(request.getPassword())
-          .role(PersonRole.ROLE_PATIENT.toString())
-          .name(request.getName())
-          .phoneNumber(request.getPhoneNumber())
-          .email(request.getEmail())
-          .gender(GenderType.fromInitial(request.getGender()))
-          .birthDate(LocalDate.of(request.getBirthYear(),
-                                  request.getBirthMonth(),
-                                  request.getBirthDay()))
-          .address(request.getAddress())
-          .build();
+      PatientEntity.PatientEntityBuilder<?, ?> builder = entity.toBuilder();
+
+      if (this.name != null) {
+        builder.name(this.name);
+      }
+
+      if (this.phoneNumber != null) {
+        builder.phoneNumber(this.phoneNumber);
+      }
+
+      if (this.email != null) {
+        builder.email(this.email);
+      }
+
+      if (this.gender != null) {
+        builder.gender(GenderType.fromInitial(this.gender));
+      }
+
+      if (this.address != null) {
+        builder.address(this.address);
+      }
+
+      LocalDate currentBirthDay = entity.getBirthDate();
+      int year = (this.birthYear != null) ? this.birthYear : currentBirthDay.getYear();
+      int month = (this.birthMonth != null) ? this.birthMonth : currentBirthDay.getMonthValue();
+      int day = (this.birthDay != null) ? this.birthDay : currentBirthDay.getDayOfMonth();
+
+      builder.birthDate(LocalDate.of(year, month, day));
+
+      return builder.build();
 
     }
 
@@ -61,8 +76,6 @@ public class PatientSignup {
   @Builder
   public static class Response {
 
-    private String username;
-
     private String name;
     private String phoneNumber;
     private String email;
@@ -71,19 +84,18 @@ public class PatientSignup {
     private LocalDate birthDate;
     private String address;
 
-    private LocalDateTime createdAt;
+    private LocalDateTime modifiedAt;
 
     public static Response fromDto(PatientDto dto) {
 
       return Response.builder()
-          .username(dto.getUsername())
           .name(dto.getName())
           .phoneNumber(dto.getPhoneNumber())
           .email(dto.getEmail())
           .gender(dto.getGender())
           .birthDate(dto.getBirthDate())
           .address(dto.getAddress())
-          .createdAt(dto.getCreatedAt())
+          .modifiedAt(dto.getModifiedAt())
           .build();
 
     }
