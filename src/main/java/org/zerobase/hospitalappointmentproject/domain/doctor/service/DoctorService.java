@@ -97,20 +97,22 @@ public class DoctorService {
   @Transactional
   public DoctorDto updateInfo(String username, DoctorInfoUpdate.Request request) {
 
-    DoctorEntity doctor = doctorRepository.findByUsername(username);
-
-    if (request.getCurrentPassword() != null) {
-      if (!bCryptPasswordEncoder.matches(request.getCurrentPassword(), doctor.getPassword())) {
-        throw new CustomException(CURRENT_PASSWORD_DOES_NOT_MATCH);
-      }
-    } else {
+    if (request.getCurrentPassword() == null) {
       throw new CustomException(PASSWORD_IS_REQUIRED_TO_UPDATE_INFO);
     }
 
+    DoctorEntity doctor = doctorRepository.findByUsername(username);
+
+    if (!bCryptPasswordEncoder.matches(request.getCurrentPassword(), doctor.getPassword())) {
+      throw new CustomException(CURRENT_PASSWORD_DOES_NOT_MATCH);
+    }
+
     if (request.getNewPassword() != null) {
+
       if (!bCryptPasswordEncoder.matches(request.getNewPassword(), doctor.getPassword())) {
         throw new CustomException(NEW_PASSWORD_MUST_BE_DIFFERENT_FROM_CURRENT_ONE);
       }
+
       if (!PasswordUtils.validationPassword(request.getNewPassword())) {
         throw new CustomException(INVALID_PASSWORD);
       }

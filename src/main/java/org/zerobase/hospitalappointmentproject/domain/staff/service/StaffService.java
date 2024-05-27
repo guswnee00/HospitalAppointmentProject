@@ -95,14 +95,14 @@ public class StaffService {
   @Transactional
   public StaffDto updateInfo(String username, StaffInfoUpdate.Request request) {
 
+    if (request.getCurrentPassword() == null) {
+      throw new CustomException(PASSWORD_IS_REQUIRED_TO_UPDATE_INFO);
+    }
+
     StaffEntity staff = staffRepository.findByUsername(username);
 
-    if (request.getCurrentPassword() != null) {
-      if (!bCryptPasswordEncoder.matches(request.getCurrentPassword(), staff.getPassword())) {
-        throw new CustomException(CURRENT_PASSWORD_DOES_NOT_MATCH);
-      }
-    } else {
-      throw new CustomException(PASSWORD_IS_REQUIRED_TO_UPDATE_INFO);
+    if (!bCryptPasswordEncoder.matches(request.getCurrentPassword(), staff.getPassword())) {
+      throw new CustomException(CURRENT_PASSWORD_DOES_NOT_MATCH);
     }
 
     if (request.getNewPassword() != null) {
