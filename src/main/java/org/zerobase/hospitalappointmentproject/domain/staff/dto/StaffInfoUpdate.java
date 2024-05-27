@@ -64,6 +64,7 @@ public class StaffInfoUpdate {
           .name(dto.getName())
           .phoneNumber(dto.getPhoneNumber())
           .email(dto.getEmail())
+          .modifiedAt(dto.getModifiedAt())
           .build();
 
     }

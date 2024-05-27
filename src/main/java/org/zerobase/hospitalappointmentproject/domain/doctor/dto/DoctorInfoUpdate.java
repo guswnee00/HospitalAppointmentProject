@@ -71,6 +71,7 @@ public class DoctorInfoUpdate {
           .phoneNumber(dto.getPhoneNumber())
           .email(dto.getEmail())
           .bio(dto.getBio())
+          .modifiedAt(dto.getModifiedAt())
           .build();
 
     }
