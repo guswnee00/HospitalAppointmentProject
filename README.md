@@ -66,11 +66,9 @@
 - 회원가입 : `signup/patient`
 - 로그인 : `login/patient`
 #### 개인 정보
-- 조회 : `/patient/my-info`
-- 수정 : `/patient/update-info`
-- 삭제 : `/patient/delete-info`
+- 조회 / 수정 / 삭제: `/patient/my-info`
 #### 예약 정보
-- 조회 / 수정 / 삭제 : `/patient/appointment/{patientId}`
+- 조회 / 수정 / 삭제 : `/patient/my-appointment`
 #### 진료 기록
 - 진료 기록 조회 :  
 
@@ -79,9 +77,8 @@
 - 회원가입 : `signup/doctor`
 - 로그인 : `login/doctor`
 #### 개인 정보
-- 조회 : `/doctor/my-info`
-- 수정  : `/doctor/update-info`
-- 삭제 : `/doctor/delete-info`
+- 조회 / 수정 / 삭제: `/doctor/my-info`
+
 #### 진료 기록
 - 진료 기록 작성 :
 - 진료 기록 조회 :
@@ -92,8 +89,7 @@
 - 회원가입 : `signup/staff`
 - 로그인 : `login/staff`
 #### 개인 정보
-- 조회 : `/staff/my-info`
-- 수정 : `/staff/update-info`
+- 조회 / 수정 : `/staff/my-info`
 
 #### 예약 정보
 - 예약 정보 조회 : 
