@@ -102,10 +102,11 @@ public class DoctorService {
     if (request.getCurrentPassword() != null) {
       if (!bCryptPasswordEncoder.matches(request.getCurrentPassword(), doctor.getPassword())) {
         throw new CustomException(CURRENT_PASSWORD_DOES_NOT_MATCH);
-      } else {
-        throw new CustomException(PASSWORD_IS_REQUIRED_TO_UPDATE_INFO);
       }
+    } else {
+      throw new CustomException(PASSWORD_IS_REQUIRED_TO_UPDATE_INFO);
     }
+
     if (request.getNewPassword() != null) {
       if (!bCryptPasswordEncoder.matches(request.getNewPassword(), doctor.getPassword())) {
         throw new CustomException(NEW_PASSWORD_MUST_BE_DIFFERENT_FROM_CURRENT_ONE);

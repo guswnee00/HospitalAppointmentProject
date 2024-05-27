@@ -98,12 +98,11 @@ public class StaffService {
     StaffEntity staff = staffRepository.findByUsername(username);
 
     if (request.getCurrentPassword() != null) {
-
       if (!bCryptPasswordEncoder.matches(request.getCurrentPassword(), staff.getPassword())) {
         throw new CustomException(CURRENT_PASSWORD_DOES_NOT_MATCH);
-      } else {
-        throw new CustomException(PASSWORD_IS_REQUIRED_TO_UPDATE_INFO);
       }
+    } else {
+      throw new CustomException(PASSWORD_IS_REQUIRED_TO_UPDATE_INFO);
     }
 
     if (request.getNewPassword() != null) {
