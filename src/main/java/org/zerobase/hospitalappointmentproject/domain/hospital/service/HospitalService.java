@@ -2,6 +2,7 @@ package org.zerobase.hospitalappointmentproject.domain.hospital.service;
 
 import static org.zerobase.hospitalappointmentproject.global.exception.ErrorCode.CURRENT_PASSWORD_DOES_NOT_MATCH;
 import static org.zerobase.hospitalappointmentproject.global.exception.ErrorCode.HOSPITAL_IS_ALREADY_REGISTERED;
+import static org.zerobase.hospitalappointmentproject.global.exception.ErrorCode.HOSPITAL_NOT_FOUND;
 import static org.zerobase.hospitalappointmentproject.global.exception.ErrorCode.PASSWORD_DOES_NOT_MATCH;
 import static org.zerobase.hospitalappointmentproject.global.exception.ErrorCode.PASSWORD_IS_REQUIRED_TO_UPDATE_INFO;
 import static org.zerobase.hospitalappointmentproject.global.exception.ErrorCode.THIS_HOSPITAL_NAME_ALREADY_EXISTS;
@@ -58,7 +59,6 @@ public class HospitalService {
 
   }
 
-
   /*
    * 병원 관계자의 병원 정보 수정
    *    1. 비밀번호 입력 확인(정보를 변경하기 위해서는 비밀번호 입력해야함)
@@ -104,6 +104,25 @@ public class HospitalService {
     }
 
     hospitalRepository.delete(hospital);
+
+  }
+
+  /**
+   * 병원 이름으로 병원 정보 조회
+   *    1. 병원 이름으로 엔티티 가져오기
+   *    2. 병원 정보가 없다면 예외 발생
+   *    3. 병원 정보 있다면 mapper 를 이용해 dto 반환
+   */
+  @Transactional
+  public HospitalDto getInfo(String hospitalName) {
+
+    HospitalEntity hospital = hospitalRepository.findByName(hospitalName);
+
+    if (hospital == null) {
+      throw new CustomException(HOSPITAL_NOT_FOUND);
+    }
+
+    return hospitalMapper.toDto(hospital);
 
   }
 
