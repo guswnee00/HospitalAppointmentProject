@@ -45,7 +45,7 @@ public class HospitalController {
   ) {
     String username = userDetails.getUsername();
     hospitalService.delete(username, request.getPassword());
-    return ResponseEntity.ok("병원 정보 삭제가 완료되었습니다.");
+    return ResponseEntity.ok("병원 삭제가 완료되었습니다.");
   }
 
 }
