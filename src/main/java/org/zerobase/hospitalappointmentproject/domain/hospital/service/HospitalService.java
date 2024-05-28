@@ -2,6 +2,7 @@ package org.zerobase.hospitalappointmentproject.domain.hospital.service;
 
 import static org.zerobase.hospitalappointmentproject.global.exception.ErrorCode.CURRENT_PASSWORD_DOES_NOT_MATCH;
 import static org.zerobase.hospitalappointmentproject.global.exception.ErrorCode.HOSPITAL_IS_ALREADY_REGISTERED;
+import static org.zerobase.hospitalappointmentproject.global.exception.ErrorCode.PASSWORD_DOES_NOT_MATCH;
 import static org.zerobase.hospitalappointmentproject.global.exception.ErrorCode.PASSWORD_IS_REQUIRED_TO_UPDATE_INFO;
 import static org.zerobase.hospitalappointmentproject.global.exception.ErrorCode.THIS_HOSPITAL_NAME_ALREADY_EXISTS;
 
@@ -78,10 +79,31 @@ public class HospitalService {
       throw new CustomException(CURRENT_PASSWORD_DOES_NOT_MATCH);
     }
 
-    HospitalEntity hospital = staffRepository.findByUsername(username).getHospital();
+    HospitalEntity hospital = staff.getHospital();
     HospitalEntity updateEntity = hospitalRepository.save(request.toUpdateEntity(hospital));
 
     return hospitalMapper.toDto(updateEntity);
+
+  }
+
+  /**
+   * 병원 관계자의 병원 삭제
+   *    1. 아이디로 병원 관계자 엔티티 가져오기
+   *    2. 해당 관계자의 병원 엔티티 가져오기
+   *    3. 비밀번호를 입력했고 그 비밀번호가 일치하는지 확인
+   *    4. 엔티티 삭제
+   */
+  @Transactional
+  public void delete(String username, String password) {
+
+    StaffEntity staff = staffRepository.findByUsername(username);
+    HospitalEntity hospital = staff.getHospital();
+
+    if (password == null || !bCryptPasswordEncoder.matches(password, staff.getPassword())) {
+      throw new CustomException(PASSWORD_DOES_NOT_MATCH);
+    }
+
+    hospitalRepository.delete(hospital);
 
   }
 
