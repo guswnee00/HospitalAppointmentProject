@@ -4,10 +4,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.zerobase.hospitalappointmentproject.domain.hospital.dto.HospitalDto;
+import org.zerobase.hospitalappointmentproject.domain.hospital.dto.HospitalInfoUpdate;
 import org.zerobase.hospitalappointmentproject.domain.hospital.dto.HospitalRegister;
 import org.zerobase.hospitalappointmentproject.domain.hospital.service.HospitalService;
 
@@ -24,6 +26,15 @@ public class HospitalController {
     String username = userDetails.getUsername();
     HospitalDto hospitalDto = hospitalService.register(username, request);
     return ResponseEntity.ok(HospitalRegister.Response.fromDto(hospitalDto));
+  }
+
+  @PatchMapping("/staff/my-hospital")
+  public ResponseEntity<?> update(@AuthenticationPrincipal UserDetails userDetails,
+                                  @RequestBody HospitalInfoUpdate.Request request
+  ) {
+    String username = userDetails.getUsername();
+    HospitalDto hospitalDto = hospitalService.updateInfo(username, request);
+    return ResponseEntity.ok(HospitalInfoUpdate.Response.fromDto(hospitalDto));
   }
 
 }
