@@ -6,6 +6,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
+import java.time.LocalTime;
 import java.util.Set;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -32,6 +33,11 @@ public class HospitalEntity {
   private Double latitude;
   private Double longitude;
   private String contactNumber;
+
+  private LocalTime openTime;
+  private LocalTime closeTime;
+  private LocalTime lunchStartTime;
+  private LocalTime lunchEndTime;
 
   @Column(columnDefinition = "TEXT")
   private String description;
