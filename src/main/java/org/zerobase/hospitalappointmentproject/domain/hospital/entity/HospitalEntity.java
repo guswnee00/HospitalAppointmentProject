@@ -9,14 +9,14 @@ import jakarta.persistence.OneToMany;
 import java.time.LocalTime;
 import java.util.Set;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import lombok.experimental.SuperBuilder;
 import org.zerobase.hospitalappointmentproject.domain.appointment.entity.AppointmentEntity;
 import org.zerobase.hospitalappointmentproject.domain.doctor.entity.DoctorEntity;
 
-@Builder
+@SuperBuilder(toBuilder = true)
 @Getter
 @ToString
 @NoArgsConstructor
