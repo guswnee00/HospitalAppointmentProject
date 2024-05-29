@@ -1,14 +1,11 @@
 package org.zerobase.hospitalappointmentproject.domain.hospital.dto;
 
 import java.time.LocalTime;
-import java.util.Set;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.zerobase.hospitalappointmentproject.domain.appointment.dto.AppointmentDto;
-import org.zerobase.hospitalappointmentproject.domain.doctor.dto.DoctorDto;
 
 @Setter
 @Getter
@@ -28,8 +25,5 @@ public class HospitalDto {
   private LocalTime closeTime;
   private LocalTime lunchStartTime;
   private LocalTime lunchEndTime;
-
-  private Set<DoctorDto> doctors;
-  private Set<AppointmentDto> appointments;
 
 }
