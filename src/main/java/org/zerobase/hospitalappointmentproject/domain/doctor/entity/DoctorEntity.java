@@ -21,7 +21,7 @@ import org.zerobase.hospitalappointmentproject.domain.medicalrecord.entity.Medic
 import org.zerobase.hospitalappointmentproject.domain.specialty.entity.SpecialtyEntity;
 import org.zerobase.hospitalappointmentproject.global.auth.entity.UserEntity;
 
-@SuperBuilder
+@SuperBuilder(toBuilder = true)
 @Getter
 @ToString
 @NoArgsConstructor

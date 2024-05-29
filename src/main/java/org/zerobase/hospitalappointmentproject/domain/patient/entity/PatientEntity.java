@@ -19,7 +19,7 @@ import org.zerobase.hospitalappointmentproject.global.auth.entity.UserEntity;
 import org.zerobase.hospitalappointmentproject.global.common.GenderType;
 
 
-@SuperBuilder
+@SuperBuilder(toBuilder = true)
 @Getter
 @ToString
 @NoArgsConstructor
