@@ -81,6 +81,7 @@ public class DoctorSignup {
     private String email;
 
     private String hospital;
+    private String specialty;
     private String bio;
 
     private LocalDateTime createdAt;
@@ -93,6 +94,7 @@ public class DoctorSignup {
           .phoneNumber(dto.getPhoneNumber())
           .email(dto.getEmail())
           .hospital(dto.getHospital().getName())
+          .specialty(dto.getSpecialty().getName())
           .bio(dto.getBio())
           .createdAt(dto.getCreatedAt())
           .build();
