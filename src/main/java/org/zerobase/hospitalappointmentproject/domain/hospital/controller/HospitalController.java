@@ -51,7 +51,7 @@ public class HospitalController {
     return ResponseEntity.ok("병원 삭제가 완료되었습니다.");
   }
 
-  @GetMapping("/{hospitalName}")
+  @GetMapping("/search/{hospitalName}")
   public ResponseEntity<?> getInfo(@PathVariable String hospitalName) {
     HospitalDto hospitalDto = hospitalService.getInfo(hospitalName);
     return ResponseEntity.ok(HospitalInfoResponse.fromDto(hospitalDto));
