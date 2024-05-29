@@ -104,7 +104,7 @@ public class PatientService {
 
     if (request.getNewPassword() != null) {
 
-      if (!bCryptPasswordEncoder.matches(request.getNewPassword(), patient.getPassword())) {
+      if (bCryptPasswordEncoder.matches(request.getNewPassword(), patient.getPassword())) {
         throw new CustomException(NEW_PASSWORD_MUST_BE_DIFFERENT_FROM_CURRENT_ONE);
       }
 

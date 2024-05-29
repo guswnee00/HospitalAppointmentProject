@@ -109,7 +109,7 @@ public class DoctorService {
 
     if (request.getNewPassword() != null) {
 
-      if (!bCryptPasswordEncoder.matches(request.getNewPassword(), doctor.getPassword())) {
+      if (bCryptPasswordEncoder.matches(request.getNewPassword(), doctor.getPassword())) {
         throw new CustomException(NEW_PASSWORD_MUST_BE_DIFFERENT_FROM_CURRENT_ONE);
       }
 
