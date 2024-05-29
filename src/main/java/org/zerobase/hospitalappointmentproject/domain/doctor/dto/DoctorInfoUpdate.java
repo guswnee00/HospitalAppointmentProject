@@ -1,6 +1,7 @@
 package org.zerobase.hospitalappointmentproject.domain.doctor.dto;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -28,21 +29,10 @@ public class DoctorInfoUpdate {
 
       DoctorEntity.DoctorEntityBuilder<?, ?> builder = entity.toBuilder();
 
-      if (this.name != null) {
-        builder.name(this.name);
-      }
-
-      if (this.phoneNumber != null) {
-        builder.phoneNumber(this.phoneNumber);
-      }
-
-      if (this.email != null) {
-        builder.email(this.email);
-      }
-
-      if (this.bio != null) {
-        builder.bio(this.bio);
-      }
+      Optional.ofNullable(this.name).ifPresent(builder::name);
+      Optional.ofNullable(this.phoneNumber).ifPresent(builder::phoneNumber);
+      Optional.ofNullable(this.email).ifPresent(builder::email);
+      Optional.ofNullable(this.bio).ifPresent(builder::bio);
 
       return builder.build();
 

@@ -2,6 +2,7 @@ package org.zerobase.hospitalappointmentproject.domain.patient.dto;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Optional;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -36,30 +37,15 @@ public class PatientInfoUpdate {
 
       PatientEntity.PatientEntityBuilder<?, ?> builder = entity.toBuilder();
 
-      if (this.name != null) {
-        builder.name(this.name);
-      }
-
-      if (this.phoneNumber != null) {
-        builder.phoneNumber(this.phoneNumber);
-      }
-
-      if (this.email != null) {
-        builder.email(this.email);
-      }
-
-      if (this.gender != null) {
-        builder.gender(GenderType.fromInitial(this.gender));
-      }
-
-      if (this.address != null) {
-        builder.address(this.address);
-      }
+      Optional.ofNullable(this.phoneNumber).ifPresent(builder::phoneNumber);
+      Optional.ofNullable(this.email).ifPresent(builder::email);
+      Optional.ofNullable(this.gender).ifPresent(gender -> builder.gender(GenderType.fromInitial(gender)));
+      Optional.ofNullable(this.address).ifPresent(builder::address);
 
       LocalDate currentBirthDay = entity.getBirthDate();
-      int year = (this.birthYear != null) ? this.birthYear : currentBirthDay.getYear();
-      int month = (this.birthMonth != null) ? this.birthMonth : currentBirthDay.getMonthValue();
-      int day = (this.birthDay != null) ? this.birthDay : currentBirthDay.getDayOfMonth();
+      int year = Optional.ofNullable(this.birthYear).orElse(currentBirthDay.getYear());
+      int month = Optional.ofNullable(this.birthMonth).orElse(currentBirthDay.getMonthValue());
+      int day = Optional.ofNullable(this.birthDay).orElse(currentBirthDay.getDayOfMonth());
 
       builder.birthDate(LocalDate.of(year, month, day));
 
