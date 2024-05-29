@@ -6,7 +6,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.zerobase.hospitalappointmentproject.domain.hospital.entity.HospitalEntity;
 
 public class HospitalInfoUpdate {
 
@@ -25,38 +24,6 @@ public class HospitalInfoUpdate {
     private LocalTime closeTime;
     private LocalTime lunchStartTime;
     private LocalTime lunchEndTime;
-
-    public HospitalEntity toUpdateEntity(HospitalEntity entity) {
-
-      HospitalEntity.HospitalEntityBuilder<?, ?> builder = entity.toBuilder();
-
-      if (this.contactNumber != null) {
-        builder.contactNumber(this.contactNumber);
-      }
-
-      if (this.description != null) {
-        builder.description(this.description);
-      }
-
-      if (this.openTime != null) {
-        builder.openTime(this.openTime);
-      }
-
-      if (this.closeTime != null) {
-        builder.closeTime(this.closeTime);
-      }
-
-      if (this.lunchStartTime != null) {
-        builder.lunchStartTime(this.lunchStartTime);
-      }
-
-      if (this.lunchEndTime != null) {
-        builder.lunchEndTime(this.lunchEndTime);
-      }
-
-      return builder.build();
-
-    }
 
   }
 

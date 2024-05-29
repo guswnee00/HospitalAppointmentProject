@@ -80,7 +80,7 @@ public class HospitalService {
     }
 
     HospitalEntity hospital = staff.getHospital();
-    HospitalEntity updateEntity = hospitalRepository.save(request.toUpdateEntity(hospital));
+    HospitalEntity updateEntity = hospitalRepository.save(hospital.toUpdateEntity(request));
 
     return hospitalMapper.toDto(updateEntity);
 
