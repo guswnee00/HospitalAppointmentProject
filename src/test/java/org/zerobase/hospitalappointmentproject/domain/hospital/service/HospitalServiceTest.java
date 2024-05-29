@@ -112,5 +112,40 @@ class HospitalServiceTest {
 
   }
 
+  @Test
+  void successUpdateInfo() {
+
+    when(staffRepository.findByUsername("testUsername2")).thenReturn(staff2);
+    when(bCryptPasswordEncoder.matches(updateRequest.getPassword(), staff2.getPassword())).thenReturn(true);
+    when(hospitalRepository.save(any(HospitalEntity.class))).thenAnswer(i -> i.getArguments()[0]);
+    when(hospitalMapper.toDto(any(HospitalEntity.class))).thenReturn(new HospitalDto());
+
+    HospitalDto hospitalDto = hospitalService.updateInfo("testUsername2", updateRequest);
+
+    verify(hospitalRepository).save(any(HospitalEntity.class));
+    assertNotNull(hospitalDto);
+
+  }
+
+  @Test
+  void failUpdateInfo_PasswordIsRequiredToUpdateInfo() {
+
+    updateRequest.setPassword(null);
+
+    assertThrows(CustomException.class,
+        () -> hospitalService.updateInfo("testUsername2", updateRequest));
+
+  }
+
+  @Test
+  void failUpdateInfo_CurrentPasswordDoesNotMatch() {
+
+    when(staffRepository.findByUsername("testUsername2")).thenReturn(staff2);
+    when(bCryptPasswordEncoder.matches(updateRequest.getPassword(), staff2.getPassword())).thenReturn(false);
+
+    assertThrows(CustomException.class,
+        () -> hospitalService.updateInfo("testUsername2", updateRequest));
+
+  }
 
 }
