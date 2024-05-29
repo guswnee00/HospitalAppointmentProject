@@ -49,11 +49,11 @@ public class SecurityConfiguration {
 
     // 경로별 인가 작업
     http.authorizeHttpRequests((auth) -> auth
-        .requestMatchers("/", "/signup/**", "/login/**").permitAll()    // 회원가입, 로그인 모두 허용
+        .requestMatchers("/search/**", "/signup/**", "/login/**").permitAll()    // 회원가입, 로그인, 병원 검색 모두 허용
         .requestMatchers("/swagger-ui.html", "/v1/api-docs/**", "/swagger-ui/**", "/swagger-resources/**").permitAll()    // swagger
-//        .requestMatchers("").hasRole("PATIENT")
-//        .requestMatchers("").hasRole("DOCTOR")
-//        .requestMatchers("").hasRole("STAFF")
+        .requestMatchers("/patient/**").hasRole("PATIENT")
+        .requestMatchers("/doctor/**").hasRole("DOCTOR")
+        .requestMatchers("/staff/**").hasRole("STAFF")
         .anyRequest().authenticated());
 
     // jwt 필터 추가
