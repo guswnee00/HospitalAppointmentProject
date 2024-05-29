@@ -91,7 +91,8 @@ public class HospitalService {
    *    1. 아이디로 병원 관계자 엔티티 가져오기
    *    2. 해당 관계자의 병원 엔티티 가져오기
    *    3. 비밀번호를 입력했고 그 비밀번호가 일치하는지 확인
-   *    4. 엔티티 삭제
+   *    4. 병원 관계자 엔티티에서 병원과의 연결을 끊은 뒤
+   *    5. 엔티티 삭제
    */
   @Transactional
   public void delete(String username, String password) {
@@ -102,6 +103,8 @@ public class HospitalService {
     if (password == null || !bCryptPasswordEncoder.matches(password, staff.getPassword())) {
       throw new CustomException(PASSWORD_DOES_NOT_MATCH);
     }
+
+    staffRepository.save(staff.toBuilder().hospital(null).build());
 
     hospitalRepository.delete(hospital);
 
