@@ -148,4 +148,41 @@ class HospitalServiceTest {
 
   }
 
+  @Test
+  void successDelete() {
+
+    String password = "encodedTestPassword";
+    when(staffRepository.findByUsername("testUsername2")).thenReturn(staff2);
+    when(bCryptPasswordEncoder.matches(password, staff2.getPassword())).thenReturn(true);
+
+    hospitalService.delete("testUsername2", password);
+
+    verify(staffRepository).save(any(StaffEntity.class));
+    verify(hospitalRepository).delete(any(HospitalEntity.class));
+
+  }
+
+  @Test
+  void failDelete_PasswordIsNull() {
+
+    String password = null;
+    when(staffRepository.findByUsername("testUsername2")).thenReturn(staff);
+
+    assertThrows(CustomException.class,
+        () -> hospitalService.delete("testUsername2", password));
+
+  }
+
+  @Test
+  void failDelete_PasswordDoesNotMatch() {
+
+    String password = "anotherTestPassword";
+    when(staffRepository.findByUsername("testUsername2")).thenReturn(staff);
+    when(bCryptPasswordEncoder.matches(password, staff.getPassword())).thenReturn(false);
+
+    assertThrows(CustomException.class,
+        () -> hospitalService.delete("testUsername2", password));
+
+  }
+
 }
