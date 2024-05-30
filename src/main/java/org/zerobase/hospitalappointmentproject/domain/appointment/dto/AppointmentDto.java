@@ -8,9 +8,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.zerobase.hospitalappointmentproject.domain.doctor.dto.DoctorDto;
-import org.zerobase.hospitalappointmentproject.domain.hospital.dto.HospitalDto;
-import org.zerobase.hospitalappointmentproject.domain.patient.dto.PatientDto;
 import org.zerobase.hospitalappointmentproject.global.common.AppointmentStatus;
 
 @Setter
@@ -28,8 +25,8 @@ public class AppointmentDto {
   private LocalDateTime createdAt;
   private LocalDateTime modifiedAt;
 
-  private PatientDto patient;
-  private DoctorDto doctor;
-  private HospitalDto hospital;
+  private String patientName;
+  private String doctorName;
+  private String hospitalName;
 
 }
