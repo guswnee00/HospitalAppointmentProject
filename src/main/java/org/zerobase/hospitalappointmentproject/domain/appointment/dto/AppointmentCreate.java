@@ -53,7 +53,6 @@ public class AppointmentCreate {
   @Builder
   public static class Response {
 
-    private String patientName;
     private String hospitalName;
     private String doctorName;
 
@@ -67,7 +66,6 @@ public class AppointmentCreate {
     public static Response fromDto(AppointmentDto dto) {
 
       return Response.builder()
-          .patientName(dto.getPatientName())
           .hospitalName(dto.getHospitalName())
           .doctorName(dto.getDoctorName())
           .appointmentDate(dto.getAppointmentDate())
