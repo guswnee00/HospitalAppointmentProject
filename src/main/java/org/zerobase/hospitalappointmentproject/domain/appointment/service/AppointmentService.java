@@ -12,6 +12,8 @@ import static org.zerobase.hospitalappointmentproject.global.exception.ErrorCode
 
 import java.time.LocalTime;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.zerobase.hospitalappointmentproject.domain.appointment.dto.AppointmentCreate;
@@ -132,6 +134,20 @@ public class AppointmentService {
     }
 
     appointmentRepository.delete(appointment);
+  }
+
+  /**
+   * 환자의 예약 내역 확인
+   */
+  public Page<AppointmentDto> patientAppointments(String username, Pageable pageable) {
+
+    PatientEntity patient = patientRepository.findByUsername(username)
+                                             .orElseThrow(() -> new CustomException(PATIENT_NOT_FOUND));
+
+    Page<AppointmentEntity> page = appointmentRepository.findByPatient(patient, pageable);
+
+    return page.map(AppointmentDto::toDto);
+
   }
 
 }
