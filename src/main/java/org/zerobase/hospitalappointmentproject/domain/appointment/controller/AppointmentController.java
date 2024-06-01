@@ -4,11 +4,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.zerobase.hospitalappointmentproject.domain.appointment.dto.AppointmentCreate;
 import org.zerobase.hospitalappointmentproject.domain.appointment.dto.AppointmentDto;
+import org.zerobase.hospitalappointmentproject.domain.appointment.dto.AppointmentUpdate;
 import org.zerobase.hospitalappointmentproject.domain.appointment.service.AppointmentService;
 
 @RestController
@@ -24,6 +27,16 @@ public class AppointmentController {
     String username = userDetails.getUsername();
     AppointmentDto appointmentDto = appointmentService.create(request, username);
     return ResponseEntity.ok(AppointmentCreate.Response.fromDto(appointmentDto));
+  }
+
+  @PatchMapping("/patient/my-appointment/{appointmentId}")
+  public ResponseEntity<?> update(@AuthenticationPrincipal UserDetails userDetails,
+                                  @PathVariable Long appointmentId,
+                                  @RequestBody AppointmentUpdate.Request request
+  ) {
+    String username = userDetails.getUsername();
+    AppointmentDto appointmentDto = appointmentService.update(request, appointmentId, username);
+    return ResponseEntity.ok(AppointmentUpdate.Response.fromDto(appointmentDto));
   }
 
 }
