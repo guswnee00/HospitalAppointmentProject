@@ -9,13 +9,15 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import org.zerobase.hospitalappointmentproject.domain.appointment.entity.AppointmentEntity;
 import org.zerobase.hospitalappointmentproject.domain.doctor.entity.DoctorEntity;
+import org.zerobase.hospitalappointmentproject.domain.hospital.entity.HospitalEntity;
 import org.zerobase.hospitalappointmentproject.domain.patient.entity.PatientEntity;
 
 @Repository
 public interface AppointmentRepository extends JpaRepository<AppointmentEntity, Long> {
 
   boolean existsByDoctorAndAppointmentDateAndAppointmentTime(DoctorEntity doctor, LocalDate date, LocalTime time);
-  Optional<AppointmentEntity> findByIdAndPatient_Username(Long id, String username);
+  Optional<AppointmentEntity> findByIdAndPatient(Long id, PatientEntity patient);
   Page<AppointmentEntity> findByPatient(PatientEntity patient, Pageable pageable);
+  Page<AppointmentEntity> findByHospital(HospitalEntity hospital, Pageable pageable);
 
 }
