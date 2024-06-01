@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -37,6 +38,15 @@ public class AppointmentController {
     String username = userDetails.getUsername();
     AppointmentDto appointmentDto = appointmentService.update(request, appointmentId, username);
     return ResponseEntity.ok(AppointmentUpdate.Response.fromDto(appointmentDto));
+  }
+
+  @DeleteMapping("/patient/my-appointment/{appointmentId}")
+  public ResponseEntity<?> cancel(@AuthenticationPrincipal UserDetails userDetails,
+                                  @PathVariable Long appointmentId
+  ) {
+    String username = userDetails.getUsername();
+    appointmentService.cancel(username, appointmentId);
+    return ResponseEntity.ok("예약 취소가 완료되었습니다.");
   }
 
 }
