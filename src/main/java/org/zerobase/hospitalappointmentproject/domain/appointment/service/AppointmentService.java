@@ -9,6 +9,7 @@ import static org.zerobase.hospitalappointmentproject.global.exception.ErrorCode
 import static org.zerobase.hospitalappointmentproject.global.exception.ErrorCode.HOSPITAL_NOT_FOUND;
 import static org.zerobase.hospitalappointmentproject.global.exception.ErrorCode.NOT_HOSPITAL_OPERATING_HOUR;
 import static org.zerobase.hospitalappointmentproject.global.exception.ErrorCode.PATIENT_NOT_FOUND;
+import static org.zerobase.hospitalappointmentproject.global.exception.ErrorCode.STAFF_NOT_FOUND;
 
 import java.time.LocalTime;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +28,8 @@ import org.zerobase.hospitalappointmentproject.domain.hospital.entity.HospitalEn
 import org.zerobase.hospitalappointmentproject.domain.hospital.repository.HospitalRepository;
 import org.zerobase.hospitalappointmentproject.domain.patient.entity.PatientEntity;
 import org.zerobase.hospitalappointmentproject.domain.patient.repository.PatientRepository;
+import org.zerobase.hospitalappointmentproject.domain.staff.entity.StaffEntity;
+import org.zerobase.hospitalappointmentproject.domain.staff.repository.StaffRepository;
 import org.zerobase.hospitalappointmentproject.global.common.AppointmentStatus;
 import org.zerobase.hospitalappointmentproject.global.exception.CustomException;
 
@@ -38,6 +41,7 @@ public class AppointmentService {
   private final PatientRepository patientRepository;
   private final HospitalRepository hospitalRepository;
   private final DoctorRepository doctorRepository;
+  private final StaffRepository staffRepository;
 
   /**
    * 환자의 병원 예약 생성
@@ -91,7 +95,9 @@ public class AppointmentService {
   @Transactional
   public AppointmentDto update(AppointmentUpdate.Request request, Long appointmentId, String username) {
 
-    AppointmentEntity appointment = appointmentRepository.findByIdAndPatient_Username(appointmentId, username)
+    PatientEntity patient = patientRepository.findByUsername(username)
+                                             .orElseThrow(() -> new CustomException(PATIENT_NOT_FOUND));
+    AppointmentEntity appointment = appointmentRepository.findByIdAndPatient(appointmentId, patient)
                                                          .orElseThrow(() -> new CustomException(APPOINTMENT_NOT_FOUND));
     HospitalEntity hospital = hospitalRepository.findByName(request.getHospitalName())
                                                 .orElseThrow(() -> new CustomException(HOSPITAL_NOT_FOUND));
@@ -126,7 +132,9 @@ public class AppointmentService {
   @Transactional
   public void cancel(String username, Long appointmentId) {
 
-    AppointmentEntity appointment = appointmentRepository.findByIdAndPatient_Username(appointmentId, username)
+    PatientEntity patient = patientRepository.findByUsername(username)
+                                             .orElseThrow(() -> new CustomException(PATIENT_NOT_FOUND));
+    AppointmentEntity appointment = appointmentRepository.findByIdAndPatient(appointmentId, patient)
                                                          .orElseThrow(() -> new CustomException(APPOINTMENT_NOT_FOUND));
 
     if (appointment.getStatus() != AppointmentStatus.PENDING_APPOINTMENT) {
@@ -137,7 +145,7 @@ public class AppointmentService {
   }
 
   /**
-   * 환자의 예약 내역 확인
+   * 환자의 예약 목록 확인
    */
   public Page<AppointmentDto> patientAppointments(String username, Pageable pageable) {
 
@@ -149,5 +157,21 @@ public class AppointmentService {
     return page.map(AppointmentDto::toDto);
 
   }
+
+  /**
+   * 병원 관계자의 예약 목록 확인
+   */
+  public Page<AppointmentDto> staffAppointments(String username, Pageable pageable) {
+
+    StaffEntity staff = staffRepository.findByUsername(username)
+                                       .orElseThrow(() -> new CustomException(STAFF_NOT_FOUND));
+
+    HospitalEntity hospital = staff.getHospital();
+    Page<AppointmentEntity> page = appointmentRepository.findByHospital(hospital, pageable);
+
+    return page.map(AppointmentDto::toDto);
+
+  }
+
 
 }
