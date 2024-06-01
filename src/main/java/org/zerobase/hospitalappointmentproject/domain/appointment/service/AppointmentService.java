@@ -2,6 +2,7 @@ package org.zerobase.hospitalappointmentproject.domain.appointment.service;
 
 import static org.zerobase.hospitalappointmentproject.global.exception.ErrorCode.APPOINTMENT_NOT_FOUND;
 import static org.zerobase.hospitalappointmentproject.global.exception.ErrorCode.BREAK_TIME_FOR_LUNCH;
+import static org.zerobase.hospitalappointmentproject.global.exception.ErrorCode.CANNOT_CANCEL;
 import static org.zerobase.hospitalappointmentproject.global.exception.ErrorCode.CANNOT_MODIFICATION;
 import static org.zerobase.hospitalappointmentproject.global.exception.ErrorCode.DOCTOR_IS_NOT_AVAILABLE;
 import static org.zerobase.hospitalappointmentproject.global.exception.ErrorCode.DOCTOR_NOT_FOUND;
@@ -112,6 +113,25 @@ public class AppointmentService {
 
     return AppointmentDto.toDto(updateAppointment);
 
+  }
+
+  /**
+   * 환자의 예약 취소
+   *    1. 환자의 아이디와 예약 아이디로 엔티티 가져오기
+   *    2. 예약 상태가 '예약 대기'인지 확인
+   *    3. 예약 삭제
+   */
+  @Transactional
+  public void cancel(String username, Long appointmentId) {
+
+    AppointmentEntity appointment = appointmentRepository.findByIdAndPatient_Username(appointmentId, username)
+                                                         .orElseThrow(() -> new CustomException(APPOINTMENT_NOT_FOUND));
+
+    if (appointment.getStatus() != AppointmentStatus.PENDING_APPOINTMENT) {
+      throw new CustomException(CANNOT_CANCEL);
+    }
+
+    appointmentRepository.delete(appointment);
   }
 
 }
