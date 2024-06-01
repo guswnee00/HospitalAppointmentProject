@@ -26,7 +26,7 @@ import org.zerobase.hospitalappointmentproject.domain.hospital.entity.HospitalEn
 import org.zerobase.hospitalappointmentproject.domain.patient.entity.PatientEntity;
 import org.zerobase.hospitalappointmentproject.global.common.AppointmentStatus;
 
-@Builder
+@Builder(toBuilder = true)
 @Getter
 @ToString
 @NoArgsConstructor
