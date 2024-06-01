@@ -69,4 +69,17 @@ public class AppointmentController {
     return ResponseEntity.ok(appointments);
   }
 
+  @GetMapping("/staff/my-hospital-appointment")
+  public ResponseEntity<?> staffAppointments(@AuthenticationPrincipal UserDetails userDetails,
+                                             @RequestParam(required = false, defaultValue = "appointmentDate") String sortBy,
+                                             @RequestParam(required = false, defaultValue = "asc") String sortDirection,
+                                             @PageableDefault Pageable pageable
+  ) {
+    String username = userDetails.getUsername();
+    Sort.Direction direction = Sort.Direction.fromString(sortDirection);
+    Pageable sortPage = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), Sort.by(direction, sortBy));
+    Page<AppointmentDto> appointments = appointmentService.staffAppointments(username, sortPage);
+    return ResponseEntity.ok(appointments);
+  }
+
 }
