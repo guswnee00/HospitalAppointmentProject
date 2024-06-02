@@ -208,6 +208,14 @@ public class AppointmentService {
 
   }
 
+  @Transactional
+  public void confirmAppointmentsForAllHospitals() {
+    List<StaffEntity> staffs = staffRepository.findAll();
+    for (StaffEntity staff: staffs) {
+      confirmAppointment(staff.getUsername());
+    }
+  }
+
   /**
    * 환자의 병원 도착 확인
    *    1. 환자 아이디와 예야 예약 아이디를 통해 예약 내역 가져오기
