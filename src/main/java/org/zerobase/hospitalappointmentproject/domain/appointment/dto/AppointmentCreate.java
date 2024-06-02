@@ -25,6 +25,7 @@ public class AppointmentCreate {
   public static class Request {
 
     private String hospitalName;
+    private String specialtyName;
     private String doctorName;
 
     private LocalDate appointmentDate;
@@ -54,6 +55,7 @@ public class AppointmentCreate {
   public static class Response {
 
     private String hospitalName;
+    private String specialtyName;
     private String doctorName;
 
     private LocalDate appointmentDate;
@@ -67,6 +69,7 @@ public class AppointmentCreate {
 
       return Response.builder()
           .hospitalName(dto.getHospitalName())
+          .specialtyName(dto.getSpecialtyName())
           .doctorName(dto.getDoctorName())
           .appointmentDate(dto.getAppointmentDate())
           .appointmentTime(dto.getAppointmentTime())

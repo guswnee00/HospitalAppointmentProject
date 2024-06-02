@@ -38,6 +38,7 @@ import org.zerobase.hospitalappointmentproject.domain.hospital.entity.HospitalEn
 import org.zerobase.hospitalappointmentproject.domain.hospital.repository.HospitalRepository;
 import org.zerobase.hospitalappointmentproject.domain.patient.entity.PatientEntity;
 import org.zerobase.hospitalappointmentproject.domain.patient.repository.PatientRepository;
+import org.zerobase.hospitalappointmentproject.domain.specialty.repository.SpecialtyRepository;
 import org.zerobase.hospitalappointmentproject.domain.staff.entity.StaffEntity;
 import org.zerobase.hospitalappointmentproject.domain.staff.repository.StaffRepository;
 import org.zerobase.hospitalappointmentproject.global.exception.CustomException;
@@ -51,6 +52,7 @@ public class AppointmentService {
   private final HospitalRepository hospitalRepository;
   private final DoctorRepository doctorRepository;
   private final StaffRepository staffRepository;
+  private final SpecialtyRepository specialtyRepository;
 
   /**
    * 환자의 병원 예약 생성
@@ -65,7 +67,7 @@ public class AppointmentService {
                                              .orElseThrow(() -> new CustomException(PATIENT_NOT_FOUND));
     HospitalEntity hospital = hospitalRepository.findByName(request.getHospitalName())
                                                 .orElseThrow(() -> new CustomException(HOSPITAL_NOT_FOUND));
-    DoctorEntity doctor = doctorRepository.findByUsername(request.getDoctorName())
+    DoctorEntity doctor = doctorRepository.findByNameAndSpecialty_NameAndHospital(request.getDoctorName(), request.getSpecialtyName(), hospital)
                                           .orElseThrow(() -> new CustomException(DOCTOR_NOT_FOUND));
 
     LocalTime appointmentTime = LocalTime.of(request.getAppointmentHour().getHour(), request.getAppointmentMinute().getMinute());
@@ -112,7 +114,7 @@ public class AppointmentService {
                                                          .orElseThrow(() -> new CustomException(APPOINTMENT_NOT_FOUND));
     HospitalEntity hospital = hospitalRepository.findByName(request.getHospitalName())
                                                 .orElseThrow(() -> new CustomException(HOSPITAL_NOT_FOUND));
-    DoctorEntity doctor = doctorRepository.findByUsername(request.getDoctorName())
+    DoctorEntity doctor = doctorRepository.findByName(request.getDoctorName())
                                           .orElseThrow(() -> new CustomException(DOCTOR_NOT_FOUND));
 
     if (appointment.getStatus() != PENDING_APPOINTMENT) {
@@ -128,7 +130,7 @@ public class AppointmentService {
       throw new CustomException(DOCTOR_IS_NOT_AVAILABLE);
     }
 
-    AppointmentEntity updateAppointment = appointmentRepository.save(request.toUpdateEntity(appointment, hospitalRepository, doctorRepository));
+    AppointmentEntity updateAppointment = appointmentRepository.save(request.toUpdateEntity(appointment, hospitalRepository, doctorRepository, specialtyRepository));
 
     return AppointmentDto.toDto(updateAppointment);
 
@@ -261,6 +263,7 @@ public class AppointmentService {
 
   }
 
+  // TODO - 진료 기록이 작성되면 '진료 완료' 상태로 바꾸는걸로 변경 예정
   /**
    * 진료 완료로 상태 변경
    */

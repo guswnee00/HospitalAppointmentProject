@@ -22,5 +22,6 @@ public interface AppointmentRepository extends JpaRepository<AppointmentEntity, 
   Page<AppointmentEntity> findByPatient(PatientEntity patient, Pageable pageable);
   Page<AppointmentEntity> findByHospital(HospitalEntity hospital, Pageable pageable);
   List<AppointmentEntity> findByHospitalAndStatusAndAppointmentDateLessThanEqual(HospitalEntity hospital, AppointmentStatus status, LocalDate date);
+  List<AppointmentEntity> findByAppointmentDateAndStatus(LocalDate date, AppointmentStatus status);
 
 }

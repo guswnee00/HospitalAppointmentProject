@@ -2,6 +2,7 @@ package org.zerobase.hospitalappointmentproject.domain.appointment.dto;
 
 import static org.zerobase.hospitalappointmentproject.global.exception.ErrorCode.DOCTOR_NOT_FOUND;
 import static org.zerobase.hospitalappointmentproject.global.exception.ErrorCode.HOSPITAL_NOT_FOUND;
+import static org.zerobase.hospitalappointmentproject.global.exception.ErrorCode.SPECIALTY_NOT_FOUND;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -17,6 +18,7 @@ import org.zerobase.hospitalappointmentproject.domain.doctor.entity.DoctorEntity
 import org.zerobase.hospitalappointmentproject.domain.doctor.repository.DoctorRepository;
 import org.zerobase.hospitalappointmentproject.domain.hospital.entity.HospitalEntity;
 import org.zerobase.hospitalappointmentproject.domain.hospital.repository.HospitalRepository;
+import org.zerobase.hospitalappointmentproject.domain.specialty.repository.SpecialtyRepository;
 import org.zerobase.hospitalappointmentproject.global.common.AppointmentStatus;
 import org.zerobase.hospitalappointmentproject.global.common.Hour;
 import org.zerobase.hospitalappointmentproject.global.common.Minute;
@@ -31,13 +33,14 @@ public class AppointmentUpdate {
   public static class Request {
 
     private String hospitalName;
+    private String specialtyName;
     private String doctorName;
 
     private LocalDate appointmentDate;
     private Hour appointmentHour;
     private Minute appointmentMinute;
 
-    public AppointmentEntity toUpdateEntity(AppointmentEntity entity, HospitalRepository hospitalRepository, DoctorRepository doctorRepository) {
+    public AppointmentEntity toUpdateEntity(AppointmentEntity entity, HospitalRepository hospitalRepository, DoctorRepository doctorRepository, SpecialtyRepository specialtyRepository) {
 
       AppointmentEntity.AppointmentEntityBuilder builder = entity.toBuilder();
 
@@ -47,8 +50,13 @@ public class AppointmentUpdate {
         builder.hospital(hospital);
       });
 
+      Optional.ofNullable(this.specialtyName).ifPresent(name -> {
+        specialtyRepository.findByName(name)
+            .orElseThrow(() -> new CustomException(SPECIALTY_NOT_FOUND));
+      });
+
       Optional.ofNullable(this.doctorName).ifPresent(name -> {
-        DoctorEntity doctor = doctorRepository.findByName(name)
+        DoctorEntity doctor = doctorRepository.findByNameAndSpecialty_NameAndHospital(name, this.specialtyName, entity.getHospital())
             .orElseThrow(() -> new CustomException(DOCTOR_NOT_FOUND));
         builder.doctor(doctor);
       });
@@ -76,6 +84,7 @@ public class AppointmentUpdate {
   public static class Response {
 
     private String hospitalName;
+    private String specialtyName;
     private String doctorName;
 
     private LocalDate appointmentDate;
@@ -89,6 +98,7 @@ public class AppointmentUpdate {
 
       return Response.builder()
           .hospitalName(dto.getHospitalName())
+          .specialtyName(dto.getSpecialtyName())
           .doctorName(dto.getDoctorName())
           .appointmentDate(dto.getAppointmentDate())
           .appointmentTime(dto.getAppointmentTime())
