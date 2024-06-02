@@ -1,5 +1,6 @@
 package org.zerobase.hospitalappointmentproject.domain.appointment.service;
 
+import static org.zerobase.hospitalappointmentproject.global.common.AppointmentStatus.COMPLETE_CONSULTATION;
 import static org.zerobase.hospitalappointmentproject.global.common.AppointmentStatus.CONFIRMED_APPOINTMENT;
 import static org.zerobase.hospitalappointmentproject.global.common.AppointmentStatus.NO_SHOW;
 import static org.zerobase.hospitalappointmentproject.global.common.AppointmentStatus.PENDING_APPOINTMENT;
@@ -189,6 +190,7 @@ public class AppointmentService {
    *    2. 예약 날짜 3일 전(오늘로부터 3일뒤 예약 내역들)에 '예약 확정' 처리
    *    3. 업데이트된 예약 상태 저장
    */
+  @Transactional
   public void confirmAppointment(String username) {
 
     StaffEntity staff = staffRepository.findByUsername(username)
@@ -251,5 +253,24 @@ public class AppointmentService {
 
   }
 
+  /**
+   * 진료 완료로 상태 변경
+   */
+  public void completeConsultation() {
+
+    LocalDate today = LocalDate.now();
+    LocalTime now = LocalTime.now();
+
+    List<AppointmentEntity> appointments = appointmentRepository.findByAppointmentDateAndStatus(today, WAITING_CONSULTATION);
+    for (AppointmentEntity appointment: appointments) {
+      LocalTime appointmentTime = appointment.getAppointmentTime();
+
+      if (now.isAfter(appointmentTime.plusMinutes(10))) {
+        AppointmentEntity updateAppointment = appointment.toBuilder().status(COMPLETE_CONSULTATION).build();
+        appointmentRepository.save(updateAppointment);
+      }
+    }
+
+  }
 
 }
