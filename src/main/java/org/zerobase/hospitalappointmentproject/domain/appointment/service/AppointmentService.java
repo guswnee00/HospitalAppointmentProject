@@ -1,16 +1,22 @@
 package org.zerobase.hospitalappointmentproject.domain.appointment.service;
 
+import static org.zerobase.hospitalappointmentproject.global.common.AppointmentStatus.NO_SHOW;
+import static org.zerobase.hospitalappointmentproject.global.common.AppointmentStatus.WAITING_CONSULTATION;
 import static org.zerobase.hospitalappointmentproject.global.exception.ErrorCode.APPOINTMENT_NOT_FOUND;
+import static org.zerobase.hospitalappointmentproject.global.exception.ErrorCode.ARRIVAL_CONFIRMATION_TIME_HAS_PASSED;
 import static org.zerobase.hospitalappointmentproject.global.exception.ErrorCode.BREAK_TIME_FOR_LUNCH;
 import static org.zerobase.hospitalappointmentproject.global.exception.ErrorCode.CANNOT_CANCEL;
 import static org.zerobase.hospitalappointmentproject.global.exception.ErrorCode.CANNOT_MODIFICATION;
+import static org.zerobase.hospitalappointmentproject.global.exception.ErrorCode.CHECK_YOUR_APPOINTMENT_STATUS;
 import static org.zerobase.hospitalappointmentproject.global.exception.ErrorCode.DOCTOR_IS_NOT_AVAILABLE;
 import static org.zerobase.hospitalappointmentproject.global.exception.ErrorCode.DOCTOR_NOT_FOUND;
 import static org.zerobase.hospitalappointmentproject.global.exception.ErrorCode.HOSPITAL_NOT_FOUND;
 import static org.zerobase.hospitalappointmentproject.global.exception.ErrorCode.NOT_HOSPITAL_OPERATING_HOUR;
 import static org.zerobase.hospitalappointmentproject.global.exception.ErrorCode.PATIENT_NOT_FOUND;
 import static org.zerobase.hospitalappointmentproject.global.exception.ErrorCode.STAFF_NOT_FOUND;
+import static org.zerobase.hospitalappointmentproject.global.exception.ErrorCode.TODAY_IS_NOT_A_APPOINTMENT_DAY;
 
+import java.time.LocalDate;
 import java.time.LocalTime;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -75,6 +81,7 @@ public class AppointmentService {
   }
 
   private void checkValidTime(LocalTime appointmentTime, HospitalEntity hospital) {
+
     if (appointmentTime.isBefore(hospital.getOpenTime()) || appointmentTime.isAfter(hospital.getCloseTime())) {
       throw new CustomException(NOT_HOSPITAL_OPERATING_HOUR);
     }
@@ -83,6 +90,7 @@ public class AppointmentService {
         hospital.getLunchEndTime())) {
       throw new CustomException(BREAK_TIME_FOR_LUNCH);
     }
+
   }
 
   /**
@@ -170,6 +178,51 @@ public class AppointmentService {
     Page<AppointmentEntity> page = appointmentRepository.findByHospital(hospital, pageable);
 
     return page.map(AppointmentDto::toDto);
+
+  }
+
+  /**
+   * 병원 관계자의 예약 확정 처리
+   */
+
+
+
+  /**
+   * 환자의 병원 도착 확인
+   */
+  @Transactional
+  public void patientArrival(String username, Long appointmentId) {
+
+    PatientEntity patient = patientRepository.findByUsername(username)
+                                             .orElseThrow(() -> new CustomException(PATIENT_NOT_FOUND));
+    AppointmentEntity appointment = appointmentRepository.findByIdAndPatient(appointmentId, patient)
+                                                         .orElseThrow(() -> new CustomException(APPOINTMENT_NOT_FOUND));
+
+    CheckPatientArrival(appointment);
+
+    appointmentRepository.save(appointment.toBuilder().status(WAITING_CONSULTATION).build());
+
+  }
+
+  private void CheckPatientArrival(AppointmentEntity appointment) {
+
+    LocalDate today = LocalDate.now();
+    LocalTime now = LocalTime.now();
+
+    if (!appointment.getAppointmentDate().equals(today)) {
+      throw new CustomException(TODAY_IS_NOT_A_APPOINTMENT_DAY);
+    }
+
+    LocalTime appointmentTime = appointment.getAppointmentTime();
+    if (now.isBefore(appointmentTime.minusMinutes(15))) {
+      appointmentRepository.save(appointment.toBuilder()
+                                            .status(NO_SHOW).build());
+      throw new CustomException(ARRIVAL_CONFIRMATION_TIME_HAS_PASSED);
+    }
+
+    if (appointment.getStatus() != AppointmentStatus.CONFIRMED_APPOINTMENT) {
+      throw new CustomException(CHECK_YOUR_APPOINTMENT_STATUS);
+    }
 
   }
 
