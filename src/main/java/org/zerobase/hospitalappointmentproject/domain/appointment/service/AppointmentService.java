@@ -1,6 +1,8 @@
 package org.zerobase.hospitalappointmentproject.domain.appointment.service;
 
+import static org.zerobase.hospitalappointmentproject.global.common.AppointmentStatus.CONFIRMED_APPOINTMENT;
 import static org.zerobase.hospitalappointmentproject.global.common.AppointmentStatus.NO_SHOW;
+import static org.zerobase.hospitalappointmentproject.global.common.AppointmentStatus.PENDING_APPOINTMENT;
 import static org.zerobase.hospitalappointmentproject.global.common.AppointmentStatus.WAITING_CONSULTATION;
 import static org.zerobase.hospitalappointmentproject.global.exception.ErrorCode.APPOINTMENT_NOT_FOUND;
 import static org.zerobase.hospitalappointmentproject.global.exception.ErrorCode.ARRIVAL_CONFIRMATION_TIME_HAS_PASSED;
@@ -18,6 +20,7 @@ import static org.zerobase.hospitalappointmentproject.global.exception.ErrorCode
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -36,7 +39,6 @@ import org.zerobase.hospitalappointmentproject.domain.patient.entity.PatientEnti
 import org.zerobase.hospitalappointmentproject.domain.patient.repository.PatientRepository;
 import org.zerobase.hospitalappointmentproject.domain.staff.entity.StaffEntity;
 import org.zerobase.hospitalappointmentproject.domain.staff.repository.StaffRepository;
-import org.zerobase.hospitalappointmentproject.global.common.AppointmentStatus;
 import org.zerobase.hospitalappointmentproject.global.exception.CustomException;
 
 @Service
@@ -112,7 +114,7 @@ public class AppointmentService {
     DoctorEntity doctor = doctorRepository.findByUsername(request.getDoctorName())
                                           .orElseThrow(() -> new CustomException(DOCTOR_NOT_FOUND));
 
-    if (appointment.getStatus() != AppointmentStatus.PENDING_APPOINTMENT) {
+    if (appointment.getStatus() != PENDING_APPOINTMENT) {
       throw new CustomException(CANNOT_MODIFICATION);
     }
 
@@ -145,7 +147,7 @@ public class AppointmentService {
     AppointmentEntity appointment = appointmentRepository.findByIdAndPatient(appointmentId, patient)
                                                          .orElseThrow(() -> new CustomException(APPOINTMENT_NOT_FOUND));
 
-    if (appointment.getStatus() != AppointmentStatus.PENDING_APPOINTMENT) {
+    if (appointment.getStatus() != PENDING_APPOINTMENT) {
       throw new CustomException(CANNOT_CANCEL);
     }
 
@@ -183,12 +185,35 @@ public class AppointmentService {
 
   /**
    * 병원 관계자의 예약 확정 처리
+   *    1. 병원 관계자의 아이디로 병원 엔티티 가져오기
+   *    2. 예약 날짜 3일 전(오늘로부터 3일뒤 예약 내역들)에 '예약 확정' 처리
+   *    3. 업데이트된 예약 상태 저장
    */
+  public void confirmAppointment(String username) {
 
+    StaffEntity staff = staffRepository.findByUsername(username)
+                                       .orElseThrow(() -> new CustomException(STAFF_NOT_FOUND));
 
+    HospitalEntity hospital = staff.getHospital();
+    LocalDate today = LocalDate.now();
+    LocalDate confirmationDate = today.plusDays(3);
+
+    List<AppointmentEntity> appointments = appointmentRepository.findByHospitalAndStatusAndAppointmentDateLessThanEqual(hospital, PENDING_APPOINTMENT, confirmationDate);
+    for (AppointmentEntity appointment: appointments) {
+      AppointmentEntity updateAppointment = appointment.toBuilder().status(CONFIRMED_APPOINTMENT).build();
+      appointmentRepository.save(updateAppointment);
+    }
+
+  }
 
   /**
    * 환자의 병원 도착 확인
+   *    1. 환자 아이디와 예야 예약 아이디를 통해 예약 내역 가져오기
+   *    2. 도착 확인
+   *        A. 예약 날짜 확인
+   *        B. 예약 시간 15분 전 도착 확인
+   *        C. 예약 상태가 '예약 확정' 상태인지 확인
+   *    3. 확인이 끝나면 '진료 대기' 상태로 예약 상태 변경 후 저장
    */
   @Transactional
   public void patientArrival(String username, Long appointmentId) {
@@ -220,7 +245,7 @@ public class AppointmentService {
       throw new CustomException(ARRIVAL_CONFIRMATION_TIME_HAS_PASSED);
     }
 
-    if (appointment.getStatus() != AppointmentStatus.CONFIRMED_APPOINTMENT) {
+    if (appointment.getStatus() != CONFIRMED_APPOINTMENT) {
       throw new CustomException(CHECK_YOUR_APPOINTMENT_STATUS);
     }
 
