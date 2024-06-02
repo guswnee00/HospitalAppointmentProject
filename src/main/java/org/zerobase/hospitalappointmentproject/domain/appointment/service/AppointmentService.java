@@ -1,6 +1,5 @@
 package org.zerobase.hospitalappointmentproject.domain.appointment.service;
 
-import static org.zerobase.hospitalappointmentproject.global.common.AppointmentStatus.COMPLETE_CONSULTATION;
 import static org.zerobase.hospitalappointmentproject.global.common.AppointmentStatus.CONFIRMED_APPOINTMENT;
 import static org.zerobase.hospitalappointmentproject.global.common.AppointmentStatus.NO_SHOW;
 import static org.zerobase.hospitalappointmentproject.global.common.AppointmentStatus.PENDING_APPOINTMENT;
@@ -210,6 +209,9 @@ public class AppointmentService {
 
   }
 
+  /**
+   * 모든 병원들이 오전 9시에 예약 확정처리를 자동으로 할 수 있도록 scheduling
+   */
   @Transactional
   public void confirmAppointmentsForAllHospitals() {
     List<StaffEntity> staffs = staffRepository.findAll();
@@ -259,27 +261,6 @@ public class AppointmentService {
 
     if (appointment.getStatus() != CONFIRMED_APPOINTMENT) {
       throw new CustomException(CHECK_YOUR_APPOINTMENT_STATUS);
-    }
-
-  }
-
-  // TODO - 진료 기록이 작성되면 '진료 완료' 상태로 바꾸는걸로 변경 예정
-  /**
-   * 진료 완료로 상태 변경
-   */
-  public void completeConsultation() {
-
-    LocalDate today = LocalDate.now();
-    LocalTime now = LocalTime.now();
-
-    List<AppointmentEntity> appointments = appointmentRepository.findByAppointmentDateAndStatus(today, WAITING_CONSULTATION);
-    for (AppointmentEntity appointment: appointments) {
-      LocalTime appointmentTime = appointment.getAppointmentTime();
-
-      if (now.isAfter(appointmentTime.plusMinutes(10))) {
-        AppointmentEntity updateAppointment = appointment.toBuilder().status(COMPLETE_CONSULTATION).build();
-        appointmentRepository.save(updateAppointment);
-      }
     }
 
   }
