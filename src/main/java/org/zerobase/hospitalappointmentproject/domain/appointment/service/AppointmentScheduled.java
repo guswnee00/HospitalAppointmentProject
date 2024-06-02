@@ -15,4 +15,9 @@ public class AppointmentScheduled {
     appointmentService.completeConsultation();
   }
 
+  @Scheduled(cron = "0 0 9 * * ?")
+  public void scheduleForConfirmAppointmentForAllHospital() {
+    appointmentService.confirmAppointmentsForAllHospitals();
+  }
+
 }
