@@ -45,18 +45,24 @@ public class StaffInfoUpdate {
   @Builder
   public static class Response {
 
+    private String username;
+
     private String name;
     private String phoneNumber;
     private String email;
+
+    private String hospitalName;
 
     private LocalDateTime modifiedAt;
 
     public static Response fromDto(StaffDto dto) {
 
       return Response.builder()
+          .username(dto.getUsername())
           .name(dto.getName())
           .phoneNumber(dto.getPhoneNumber())
           .email(dto.getEmail())
+          .hospitalName(dto.getHospitalName())
           .modifiedAt(dto.getModifiedAt())
           .build();
 
