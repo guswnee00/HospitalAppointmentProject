@@ -1,7 +1,5 @@
 package org.zerobase.hospitalappointmentproject.domain.doctor.dto;
 
-import static org.zerobase.hospitalappointmentproject.global.exception.ErrorCode.HOSPITAL_NOT_FOUND;
-
 import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -10,14 +8,10 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.zerobase.hospitalappointmentproject.domain.doctor.entity.DoctorEntity;
 import org.zerobase.hospitalappointmentproject.domain.hospital.entity.HospitalEntity;
-import org.zerobase.hospitalappointmentproject.domain.hospital.repository.HospitalRepository;
 import org.zerobase.hospitalappointmentproject.domain.specialty.entity.SpecialtyEntity;
-import org.zerobase.hospitalappointmentproject.domain.specialty.repository.SpecialtyRepository;
 import org.zerobase.hospitalappointmentproject.global.common.PersonRole;
-import org.zerobase.hospitalappointmentproject.global.exception.CustomException;
 
 public class DoctorSignup {
-
   @Getter
   @Setter
   @AllArgsConstructor
@@ -33,23 +27,10 @@ public class DoctorSignup {
     private String email;
 
     private String bio;
-    private String specialty;
-    private String hospital;
+    private String specialtyName;
+    private String hospitalName;
 
-    public static DoctorEntity toEntity(Request request, SpecialtyRepository specialtyRepository, HospitalRepository hospitalRepository) {
-
-      // 해당 진료 과목이 존재하는지
-      SpecialtyEntity specialty = specialtyRepository.findByName(request.getSpecialty());
-      if (specialty == null) {
-        specialty = SpecialtyEntity.builder().name(request.getSpecialty()).build();
-        specialty = specialtyRepository.save(specialty);
-      }
-
-      // 해당 병원이 존재하는지
-      HospitalEntity hospital = hospitalRepository.findByName(request.getHospital());
-      if (hospital == null) {
-        throw new CustomException(HOSPITAL_NOT_FOUND);
-      }
+    public static DoctorEntity toEntity(Request request, SpecialtyEntity specialty, HospitalEntity hospital) {
 
       return DoctorEntity.builder()
           .username(request.getUsername())
@@ -93,8 +74,8 @@ public class DoctorSignup {
           .name(dto.getName())
           .phoneNumber(dto.getPhoneNumber())
           .email(dto.getEmail())
-          .hospital(dto.getHospital().getName())
-          .specialty(dto.getSpecialty().getName())
+          .hospital(dto.getHospitalName())
+          .specialty(dto.getSpecialtyName())
           .bio(dto.getBio())
           .createdAt(dto.getCreatedAt())
           .build();

@@ -1,6 +1,8 @@
 package org.zerobase.hospitalappointmentproject.domain.doctor.service;
 
 import static org.zerobase.hospitalappointmentproject.global.exception.ErrorCode.CURRENT_PASSWORD_DOES_NOT_MATCH;
+import static org.zerobase.hospitalappointmentproject.global.exception.ErrorCode.DOCTOR_NOT_FOUND;
+import static org.zerobase.hospitalappointmentproject.global.exception.ErrorCode.HOSPITAL_NOT_FOUND;
 import static org.zerobase.hospitalappointmentproject.global.exception.ErrorCode.INVALID_PASSWORD;
 import static org.zerobase.hospitalappointmentproject.global.exception.ErrorCode.NEW_PASSWORD_MUST_BE_DIFFERENT_FROM_CURRENT_ONE;
 import static org.zerobase.hospitalappointmentproject.global.exception.ErrorCode.PASSWORD_DOES_NOT_MATCH;
@@ -16,9 +18,10 @@ import org.zerobase.hospitalappointmentproject.domain.doctor.dto.DoctorDto;
 import org.zerobase.hospitalappointmentproject.domain.doctor.dto.DoctorInfoUpdate;
 import org.zerobase.hospitalappointmentproject.domain.doctor.dto.DoctorSignup;
 import org.zerobase.hospitalappointmentproject.domain.doctor.entity.DoctorEntity;
-import org.zerobase.hospitalappointmentproject.domain.doctor.mapper.DoctorMapper;
 import org.zerobase.hospitalappointmentproject.domain.doctor.repository.DoctorRepository;
+import org.zerobase.hospitalappointmentproject.domain.hospital.entity.HospitalEntity;
 import org.zerobase.hospitalappointmentproject.domain.hospital.repository.HospitalRepository;
+import org.zerobase.hospitalappointmentproject.domain.specialty.entity.SpecialtyEntity;
 import org.zerobase.hospitalappointmentproject.domain.specialty.repository.SpecialtyRepository;
 import org.zerobase.hospitalappointmentproject.global.auth.service.UserValidationService;
 import org.zerobase.hospitalappointmentproject.global.exception.CustomException;
@@ -29,7 +32,6 @@ import org.zerobase.hospitalappointmentproject.global.util.PasswordUtils;
 public class DoctorService {
 
   private final DoctorRepository doctorRepository;
-  private final DoctorMapper doctorMapper;
   private final SpecialtyRepository specialtyRepository;
   private final HospitalRepository hospitalRepository;
   private final UserValidationService userValidationService;
@@ -61,11 +63,24 @@ public class DoctorService {
       throw new CustomException(INVALID_PASSWORD);
     }
 
+    // 해당 진료 과목이 존재하는지
+    SpecialtyEntity specialty = specialtyRepository.findByName(request.getSpecialtyName())
+                                                   .orElseGet(() -> {
+                                                      SpecialtyEntity newSpecialty = SpecialtyEntity.builder()
+                                                          .name(request.getSpecialtyName())
+                                                          .build();
+                                                      return specialtyRepository.save(newSpecialty);
+                                                    });
+
+    // 해당 병원이 존재하는지
+    HospitalEntity hospital = hospitalRepository.findByName(request.getHospitalName())
+        .orElseThrow(() -> new CustomException(HOSPITAL_NOT_FOUND));
+
     request.setPassword(bCryptPasswordEncoder.encode(request.getPassword()));
 
-    DoctorEntity doctor = doctorRepository.save(DoctorSignup.Request.toEntity(request, specialtyRepository, hospitalRepository));
+    DoctorEntity doctor = doctorRepository.save(DoctorSignup.Request.toEntity(request, specialty, hospital));
 
-    return doctorMapper.toDto(doctor);
+    return DoctorDto.toDto(doctor);
 
   }
 
@@ -77,9 +92,10 @@ public class DoctorService {
   @Transactional
   public DoctorDto getInfo(String username) {
 
-    DoctorEntity doctor = doctorRepository.findByUsername(username);
+    DoctorEntity doctor = doctorRepository.findByUsername(username)
+                                          .orElseThrow(() -> new CustomException(DOCTOR_NOT_FOUND));
 
-    return doctorMapper.toDto(doctor);
+    return DoctorDto.toDto(doctor);
 
   }
 
@@ -101,7 +117,8 @@ public class DoctorService {
       throw new CustomException(PASSWORD_IS_REQUIRED_TO_UPDATE_INFO);
     }
 
-    DoctorEntity doctor = doctorRepository.findByUsername(username);
+    DoctorEntity doctor = doctorRepository.findByUsername(username)
+                                          .orElseThrow(() -> new CustomException(DOCTOR_NOT_FOUND));
 
     if (!bCryptPasswordEncoder.matches(request.getCurrentPassword(), doctor.getPassword())) {
       throw new CustomException(CURRENT_PASSWORD_DOES_NOT_MATCH);
@@ -125,7 +142,7 @@ public class DoctorService {
 
     DoctorEntity updateEntity = doctorRepository.save(request.toUpdateEntity(doctor));
 
-    return doctorMapper.toDto(updateEntity);
+    return DoctorDto.toDto(updateEntity);
 
   }
 
@@ -138,7 +155,8 @@ public class DoctorService {
   @Transactional
   public void deleteInfo(String username, String password) {
 
-    DoctorEntity doctor = doctorRepository.findByUsername(username);
+    DoctorEntity doctor = doctorRepository.findByUsername(username)
+                                          .orElseThrow(() -> new CustomException(DOCTOR_NOT_FOUND));
 
     if (password == null || !bCryptPasswordEncoder.matches(password, doctor.getPassword())) {
       throw new CustomException(PASSWORD_DOES_NOT_MATCH);
