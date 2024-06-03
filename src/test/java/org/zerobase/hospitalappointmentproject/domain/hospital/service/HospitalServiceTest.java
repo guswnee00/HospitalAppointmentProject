@@ -3,10 +3,12 @@ package org.zerobase.hospitalappointmentproject.domain.hospital.service;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import org.junit.jupiter.api.BeforeEach;
+import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -17,7 +19,6 @@ import org.zerobase.hospitalappointmentproject.domain.hospital.dto.HospitalDto;
 import org.zerobase.hospitalappointmentproject.domain.hospital.dto.HospitalInfoUpdate;
 import org.zerobase.hospitalappointmentproject.domain.hospital.dto.HospitalRegister;
 import org.zerobase.hospitalappointmentproject.domain.hospital.entity.HospitalEntity;
-import org.zerobase.hospitalappointmentproject.domain.hospital.mapper.HospitalMapper;
 import org.zerobase.hospitalappointmentproject.domain.hospital.repository.HospitalRepository;
 import org.zerobase.hospitalappointmentproject.domain.staff.entity.StaffEntity;
 import org.zerobase.hospitalappointmentproject.domain.staff.repository.StaffRepository;
@@ -31,157 +32,173 @@ class HospitalServiceTest {
   @Mock
   private StaffRepository staffRepository;
   @Mock
-  private HospitalMapper hospitalMapper;
-  @Mock
   private BCryptPasswordEncoder bCryptPasswordEncoder;
 
   @InjectMocks
   private HospitalService hospitalService;
 
-  private StaffEntity staff, staff2;
-  private HospitalEntity hospital;
-  private HospitalRegister.Request registerRequest;
-  private HospitalInfoUpdate.Request updateRequest;
-
-  @BeforeEach
-  void init() {
-
-    staff = StaffEntity.builder()
-                      .id(1L)
-                      .username("testUsername")
-                      .hospital(null)
-                      .build();
-
-    registerRequest = new HospitalRegister.Request();
-    registerRequest.setName("testHospital");
-
-    hospital = HospitalEntity.builder()
-                            .id(1L)
-                            .name("testHospital")
-                            .build();
-
-    staff2 = StaffEntity.builder()
-                      .id(2L)
-                      .username("testUsername2")
-                      .password("encodedTestPassword")
-                      .hospital(hospital)
-                      .build();
-
-    updateRequest = new HospitalInfoUpdate.Request();
-    updateRequest.setPassword("testPassword");
-    updateRequest.setDescription("description");
-
-  }
-
   @Test
   void successRegister() {
 
-    when(staffRepository.findByUsername("testUsername")).thenReturn(staff);
-    when(hospitalRepository.existsByName(registerRequest.getName())).thenReturn(false);
-    when(hospitalRepository.save(any(HospitalEntity.class))).thenAnswer(i -> i.getArguments()[0]);
-    when(hospitalMapper.toDto(any(HospitalEntity.class))).thenReturn(new HospitalDto());
+    StaffEntity staff = StaffEntity.builder().username("username").build();
+    HospitalRegister.Request request = new HospitalRegister.Request();
+    request.setName("testHospital");
 
-    HospitalDto hospitalDto = hospitalService.register("testUsername", registerRequest);
+    when(staffRepository.findByUsername("testUsername")).thenReturn(Optional.of(staff));
+    when(hospitalRepository.existsByName(request.getName())).thenReturn(false);
 
-    verify(staffRepository).save(any(StaffEntity.class));
-    verify(hospitalRepository).save(any(HospitalEntity.class));
+    HospitalEntity hospital = HospitalEntity.builder().name("testHospital").build();
+    when(hospitalRepository.save(any(HospitalEntity.class))).thenReturn(hospital);
+
+    staff = staff.toBuilder().hospital(hospital).build();
+    when(staffRepository.save(any(StaffEntity.class))).thenReturn(staff);
+
+    HospitalDto hospitalDto = hospitalService.register("testUsername", request);
+
     assertNotNull(hospitalDto);
+    verify(staffRepository, times(1)).save(any(StaffEntity.class));
+    verify(hospitalRepository, times(1)).save(any(HospitalEntity.class));
+  }
+
+  @Test
+  void failRegister_StaffNotFound() {
+
+    HospitalRegister.Request request = new HospitalRegister.Request();
+
+    when(staffRepository.findByUsername("testUsername")).thenReturn(Optional.empty());
+
+    assertThrows(CustomException.class, () -> hospitalService.register("testUsername", request));
 
   }
 
   @Test
   void failRegister_HospitalIsAlreadyRegistered() {
 
-    when(staffRepository.findByUsername("testUsername")).thenReturn(staff);
-    staff = staff.toBuilder().hospital(new HospitalEntity()).build();
-    when(staffRepository.findByUsername("testUsername")).thenReturn(staff);
+    StaffEntity staff = StaffEntity.builder().username("testUsername").hospital(new HospitalEntity()).build();
+    HospitalRegister.Request request = new HospitalRegister.Request();
 
-    assertThrows(CustomException.class,
-        () -> hospitalService.register("testUsername", registerRequest));
+    when(staffRepository.findByUsername("testUsername")).thenReturn(Optional.of(staff));
+
+    assertThrows(CustomException.class, () -> hospitalService.register("testUsername", request));
 
   }
 
   @Test
   void failRegister_ThisHospitalNameAlreadyExists() {
 
-    when(staffRepository.findByUsername("testUsername")).thenReturn(staff);
-    when(hospitalRepository.existsByName(registerRequest.getName())).thenReturn(true);
+    StaffEntity staff = StaffEntity.builder().username("testUsername").build();
+    HospitalRegister.Request request = new HospitalRegister.Request();
+    request.setName("testHospital");
 
-    assertThrows(CustomException.class,
-        () -> hospitalService.register("testUsername", registerRequest));
+    when(staffRepository.findByUsername("testUsername")).thenReturn(Optional.of(staff));
+    when(hospitalRepository.existsByName(request.getName())).thenReturn(true);
+
+    assertThrows(CustomException.class, () -> hospitalService.register("testUsername", request));
 
   }
 
   @Test
   void successUpdateInfo() {
 
-    when(staffRepository.findByUsername("testUsername2")).thenReturn(staff2);
-    when(bCryptPasswordEncoder.matches(updateRequest.getPassword(), staff2.getPassword())).thenReturn(true);
-    when(hospitalRepository.save(any(HospitalEntity.class))).thenAnswer(i -> i.getArguments()[0]);
-    when(hospitalMapper.toDto(any(HospitalEntity.class))).thenReturn(new HospitalDto());
+    StaffEntity staff = StaffEntity.builder().username("testUsername").password("encodedPassword").build();
+    HospitalEntity hospital = HospitalEntity.builder().name("hospital1").build();
+    staff = staff.toBuilder().hospital(hospital).build();
 
-    HospitalDto hospitalDto = hospitalService.updateInfo("testUsername2", updateRequest);
+    HospitalInfoUpdate.Request request = new HospitalInfoUpdate.Request();
+    request.setPassword("password123");
 
-    verify(hospitalRepository).save(any(HospitalEntity.class));
+    when(staffRepository.findByUsername("testUsername")).thenReturn(Optional.of(staff));
+    when(bCryptPasswordEncoder.matches(request.getPassword(), staff.getPassword())).thenReturn(true);
+
+    HospitalEntity updatedHospital = HospitalEntity.builder().name("hospital2").build();
+    when(hospitalRepository.save(any(HospitalEntity.class))).thenReturn(updatedHospital);
+
+    HospitalDto hospitalDto = hospitalService.updateInfo("testUsername", request);
+
     assertNotNull(hospitalDto);
+    verify(hospitalRepository, times(1)).save(any(HospitalEntity.class));
 
   }
 
   @Test
-  void failUpdateInfo_PasswordIsRequiredToUpdateInfo() {
+  void failUpdateInfo_StaffNotFound() {
 
-    updateRequest.setPassword(null);
+    HospitalInfoUpdate.Request request = new HospitalInfoUpdate.Request();
 
-    assertThrows(CustomException.class,
-        () -> hospitalService.updateInfo("testUsername2", updateRequest));
+    lenient().when(staffRepository.findByUsername("testUsername")).thenReturn(Optional.empty());
+
+    assertThrows(CustomException.class, () -> hospitalService.updateInfo("testUsername", request));
 
   }
 
   @Test
   void failUpdateInfo_CurrentPasswordDoesNotMatch() {
 
-    when(staffRepository.findByUsername("testUsername2")).thenReturn(staff2);
-    when(bCryptPasswordEncoder.matches(updateRequest.getPassword(), staff2.getPassword())).thenReturn(false);
+    StaffEntity staff = StaffEntity.builder().username("testUsername").password("encodedPassword").build();
+    HospitalInfoUpdate.Request request = new HospitalInfoUpdate.Request();
+    request.setPassword("wrongPassword");
 
-    assertThrows(CustomException.class,
-        () -> hospitalService.updateInfo("testUsername2", updateRequest));
+    when(staffRepository.findByUsername("testUsername")).thenReturn(Optional.of(staff));
+    when(bCryptPasswordEncoder.matches(request.getPassword(), staff.getPassword())).thenReturn(false);
+
+    assertThrows(CustomException.class, () -> hospitalService.updateInfo("testUsername", request));
 
   }
 
   @Test
   void successDelete() {
 
-    String password = "encodedTestPassword";
-    when(staffRepository.findByUsername("testUsername2")).thenReturn(staff2);
-    when(bCryptPasswordEncoder.matches(password, staff2.getPassword())).thenReturn(true);
+    StaffEntity staff = StaffEntity.builder().username("testUsername").password("encodedPassword").build();
+    HospitalEntity hospital = HospitalEntity.builder().name("hospital1").build();
+    staff = staff.toBuilder().hospital(hospital).build();
 
-    hospitalService.delete("testUsername2", password);
+    when(staffRepository.findByUsername("testUsername")).thenReturn(Optional.of(staff));
+    when(bCryptPasswordEncoder.matches("password123", staff.getPassword())).thenReturn(true);
 
-    verify(staffRepository).save(any(StaffEntity.class));
-    verify(hospitalRepository).delete(any(HospitalEntity.class));
+    hospitalService.delete("testUsername", "password123");
+
+    verify(staffRepository, times(1)).save(any(StaffEntity.class));
+    verify(hospitalRepository, times(1)).delete(hospital);
 
   }
 
   @Test
-  void failDelete_PasswordIsNull() {
+  void failDelete_StaffNotFound() {
+    when(staffRepository.findByUsername("testUsername")).thenReturn(Optional.empty());
 
-    String password = null;
-    when(staffRepository.findByUsername("testUsername2")).thenReturn(staff);
-
-    assertThrows(CustomException.class,
-        () -> hospitalService.delete("testUsername2", password));
-
+    assertThrows(CustomException.class, () -> hospitalService.delete("testUsername", "password123"));
   }
 
   @Test
   void failDelete_PasswordDoesNotMatch() {
 
-    String password = "anotherTestPassword";
-    when(staffRepository.findByUsername("testUsername2")).thenReturn(staff);
-    when(bCryptPasswordEncoder.matches(password, staff.getPassword())).thenReturn(false);
+    StaffEntity staff = StaffEntity.builder().username("testUsername").password("encodedPassword").build();
 
-    assertThrows(CustomException.class,
-        () -> hospitalService.delete("testUsername2", password));
+    when(staffRepository.findByUsername("testUsername")).thenReturn(Optional.of(staff));
+    when(bCryptPasswordEncoder.matches("wrongPassword", staff.getPassword())).thenReturn(false);
+
+    assertThrows(CustomException.class, () -> hospitalService.delete("testUsername", "wrongPassword"));
+
+  }
+
+  @Test
+  void successGetInfo() {
+
+    HospitalEntity hospital = HospitalEntity.builder().name("hospital1").build();
+    when(hospitalRepository.findByName("hospital1")).thenReturn(Optional.of(hospital));
+
+    HospitalDto hospitalDto = hospitalService.searchByHospitalName("hospital1");
+
+    assertNotNull(hospitalDto);
+
+  }
+
+  @Test
+  void failGetInfo_HospitalNotFound() {
+
+    when(hospitalRepository.findByName("hospital1")).thenReturn(Optional.empty());
+
+    assertThrows(CustomException.class, () -> hospitalService.searchByHospitalName("hospital1"));
 
   }
 
