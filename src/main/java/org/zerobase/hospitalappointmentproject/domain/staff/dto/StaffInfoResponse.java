@@ -28,7 +28,7 @@ public class StaffInfoResponse {
         .name(dto.getName())
         .phoneNumber(dto.getPhoneNumber())
         .email(dto.getEmail())
-        .hospitalName(dto.getHospital().getName())
+        .hospitalName(dto.getHospitalName())
         .build();
   }
 

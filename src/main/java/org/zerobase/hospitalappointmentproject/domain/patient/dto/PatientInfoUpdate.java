@@ -22,7 +22,6 @@ public class PatientInfoUpdate {
     private String currentPassword;
     private String newPassword;
 
-    private String name;
     private String phoneNumber;
     private String email;
 

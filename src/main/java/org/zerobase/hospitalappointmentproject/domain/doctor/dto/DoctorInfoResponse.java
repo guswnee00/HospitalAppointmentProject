@@ -29,8 +29,8 @@ public class DoctorInfoResponse {
         .name(dto.getName())
         .phoneNumber(dto.getPhoneNumber())
         .email(dto.getEmail())
-        .specialtyName(dto.getSpecialty().getName())
-        .hospitalName(dto.getHospital().getName())
+        .specialtyName(dto.getSpecialtyName())
+        .hospitalName(dto.getHospitalName())
         .build();
 
   }

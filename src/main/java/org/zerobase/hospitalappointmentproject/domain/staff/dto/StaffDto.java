@@ -6,7 +6,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.zerobase.hospitalappointmentproject.domain.hospital.dto.HospitalDto;
+import org.zerobase.hospitalappointmentproject.domain.staff.entity.StaffEntity;
 
 @Setter
 @Getter
@@ -23,9 +23,25 @@ public class StaffDto {
   private String phoneNumber;
   private String email;
 
-  private HospitalDto hospital;
+  private String hospitalName;
 
   private LocalDateTime createdAt;
   private LocalDateTime modifiedAt;
+
+  public static StaffDto toDto(StaffEntity entity) {
+
+    return StaffDto.builder()
+        .username(entity.getUsername())
+        .password(entity.getPassword())
+        .role(entity.getRole())
+        .name(entity.getName())
+        .phoneNumber(entity.getPhoneNumber())
+        .email(entity.getEmail())
+        .hospitalName(entity.getHospital() != null ? entity.getHospital().getName() : null)
+        .createdAt(entity.getCreatedAt())
+        .modifiedAt(entity.getModifiedAt())
+        .build();
+
+  }
 
 }

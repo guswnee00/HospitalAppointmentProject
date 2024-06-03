@@ -4,7 +4,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
+import static org.zerobase.hospitalappointmentproject.global.exception.ErrorCode.PASSWORD_DOES_NOT_MATCH;
+import static org.zerobase.hospitalappointmentproject.global.exception.ErrorCode.USERNAME_DOES_NOT_EXIST;
 
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -30,7 +33,7 @@ class LoginServiceTest {
   private LoginService loginService;
 
   private LoginDto loginDto;
-  private PatientEntity patientEntity;
+  private PatientEntity patient;
 
   @BeforeEach
   void init() {
@@ -38,17 +41,18 @@ class LoginServiceTest {
     loginDto.setUsername("testUsername");
     loginDto.setPassword("testPassword");
 
-    patientEntity = PatientEntity.builder()
+    patient = PatientEntity.builder()
         .username("testUsername")
-        .password("$2a$10$DOWSDu7lH8/ZZ7K8oSkR.e5ECIU/8oeHZV5bQf1Jhzl/3fBzC9q2K").build();
+        .password("$2a$10$DOWSDu7lH8/ZZ7K8oSkR.e5ECIU/8oeHZV5bQf1Jhzl/3fBzC9q2K")
+        .build();
 
   }
 
   @Test
   void successLogin() {
 
-    when(patientRepository.findByUsername("testUsername")).thenReturn(patientEntity);
-    when(bCryptPasswordEncoder.matches("testPassword", patientEntity.getPassword())).thenReturn(true);
+    when(patientRepository.findByUsername("testUsername")).thenReturn(Optional.ofNullable(patient));
+    when(bCryptPasswordEncoder.matches("testPassword", patient.getPassword())).thenReturn(true);
 
     PatientEntity patient = loginService.patientLogin(loginDto);
 
@@ -60,25 +64,23 @@ class LoginServiceTest {
   @Test
   void failLogin_UsernameDoesNotExist() {
 
-    when(patientRepository.findByUsername("testUsername")).thenReturn(null);
+    when(patientRepository.findByUsername("testUsername")).thenReturn(Optional.empty());
 
-    CustomException exception = assertThrows(CustomException.class,
-        () -> loginService.patientLogin(loginDto));
+    CustomException exception = assertThrows(CustomException.class, () -> loginService.patientLogin(loginDto));
 
-    assertEquals("존재하지 않는 아이디 입니다.", exception.getErrorMessage());
+    assertEquals(USERNAME_DOES_NOT_EXIST.getDescription(), exception.getErrorMessage());
 
   }
 
   @Test
   void failLogin_PasswordDoesNotExist() {
 
-    when(patientRepository.findByUsername("testUsername")).thenReturn(patientEntity);
-    when(bCryptPasswordEncoder.matches("testPassword", patientEntity.getPassword())).thenReturn(false);
+    when(patientRepository.findByUsername("testUsername")).thenReturn(Optional.of(patient));
+    when(bCryptPasswordEncoder.matches("testPassword", patient.getPassword())).thenReturn(false);
 
-    CustomException exception = assertThrows(CustomException.class,
-        () -> loginService.patientLogin(loginDto));
+    CustomException exception = assertThrows(CustomException.class, () -> loginService.patientLogin(loginDto));
 
-    assertEquals("비밀번호가 일치하지 않습니다.", exception.getErrorMessage());
+    assertEquals(PASSWORD_DOES_NOT_MATCH.getDescription(), exception.getErrorMessage());
 
   }
 

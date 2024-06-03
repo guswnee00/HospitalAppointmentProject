@@ -33,11 +33,8 @@ public class LoginService {
 
   public PatientEntity patientLogin(LoginDto loginDto) {
 
-    PatientEntity patient = patientRepository.findByUsername(loginDto.getUsername());
-
-    if (patient == null) {
-      throw new CustomException(USERNAME_DOES_NOT_EXIST);
-    }
+    PatientEntity patient = patientRepository.findByUsername(loginDto.getUsername())
+        .orElseThrow(() -> new CustomException(USERNAME_DOES_NOT_EXIST));
 
     if (!bCryptPasswordEncoder.matches(loginDto.getPassword(), patient.getPassword())) {
       throw new CustomException(PASSWORD_DOES_NOT_MATCH);
@@ -48,11 +45,8 @@ public class LoginService {
 
   public DoctorEntity doctorLogin(LoginDto loginDto) {
 
-    DoctorEntity doctor = doctorRepository.findByUsername(loginDto.getUsername());
-
-    if (doctor == null) {
-      throw new CustomException(USERNAME_DOES_NOT_EXIST);
-    }
+    DoctorEntity doctor = doctorRepository.findByUsername(loginDto.getUsername())
+        .orElseThrow(() -> new CustomException(USERNAME_DOES_NOT_EXIST));
 
     if (!bCryptPasswordEncoder.matches(loginDto.getPassword(), doctor.getPassword())) {
       throw new CustomException(PASSWORD_DOES_NOT_MATCH);
@@ -64,11 +58,8 @@ public class LoginService {
 
   public StaffEntity staffLogin(LoginDto loginDto) {
 
-    StaffEntity staff = staffRepository.findByUsername(loginDto.getUsername());
-
-    if (staff == null) {
-      throw new CustomException(USERNAME_DOES_NOT_EXIST);
-    }
+    StaffEntity staff = staffRepository.findByUsername(loginDto.getUsername())
+        .orElseThrow(() -> new CustomException(USERNAME_DOES_NOT_EXIST));
 
     if (!bCryptPasswordEncoder.matches(loginDto.getPassword(), staff.getPassword())) {
       throw new CustomException(PASSWORD_DOES_NOT_MATCH);

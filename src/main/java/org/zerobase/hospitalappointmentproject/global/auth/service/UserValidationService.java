@@ -16,9 +16,9 @@ public class UserValidationService {
 
   public boolean isUsernameUsed(String username) {
 
-    boolean patientExists = patientRepository.findByUsername(username) != null;
-    boolean doctorExists = doctorRepository.findByUsername(username) != null;
-    boolean staffExists = staffRepository.findByUsername(username) != null;
+    boolean patientExists = patientRepository.findByUsername(username).isPresent();
+    boolean doctorExists = doctorRepository.findByUsername(username).isPresent();
+    boolean staffExists = staffRepository.findByUsername(username).isPresent();
 
     return patientExists || doctorExists || staffExists;
 

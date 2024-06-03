@@ -51,8 +51,8 @@ public class DoctorInfoUpdate {
     private String phoneNumber;
     private String email;
 
-    private String hospital;
-    private String specialty;
+    private String hospitalName;
+    private String specialtyName;
     private String bio;
 
     private LocalDateTime modifiedAt;
@@ -63,8 +63,8 @@ public class DoctorInfoUpdate {
           .name(dto.getName())
           .phoneNumber(dto.getPhoneNumber())
           .email(dto.getEmail())
-          .hospital(dto.getHospital().getName())
-          .specialty(dto.getSpecialty().getName())
+          .hospitalName(dto.getHospitalName())
+          .specialtyName(dto.getSpecialtyName())
           .bio(dto.getBio())
           .modifiedAt(dto.getModifiedAt())
           .build();

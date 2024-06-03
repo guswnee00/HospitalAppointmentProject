@@ -5,6 +5,7 @@ import static org.zerobase.hospitalappointmentproject.global.exception.ErrorCode
 import static org.zerobase.hospitalappointmentproject.global.exception.ErrorCode.NEW_PASSWORD_MUST_BE_DIFFERENT_FROM_CURRENT_ONE;
 import static org.zerobase.hospitalappointmentproject.global.exception.ErrorCode.PASSWORD_DOES_NOT_MATCH;
 import static org.zerobase.hospitalappointmentproject.global.exception.ErrorCode.PASSWORD_IS_REQUIRED_TO_UPDATE_INFO;
+import static org.zerobase.hospitalappointmentproject.global.exception.ErrorCode.PATIENT_NOT_FOUND;
 import static org.zerobase.hospitalappointmentproject.global.exception.ErrorCode.TWO_PASSWORDS_DO_NOT_MATCH;
 import static org.zerobase.hospitalappointmentproject.global.exception.ErrorCode.USERNAME_ALREADY_IN_USE;
 
@@ -16,7 +17,6 @@ import org.zerobase.hospitalappointmentproject.domain.patient.dto.PatientDto;
 import org.zerobase.hospitalappointmentproject.domain.patient.dto.PatientInfoUpdate;
 import org.zerobase.hospitalappointmentproject.domain.patient.dto.PatientSignup;
 import org.zerobase.hospitalappointmentproject.domain.patient.entity.PatientEntity;
-import org.zerobase.hospitalappointmentproject.domain.patient.mapper.PatientMapper;
 import org.zerobase.hospitalappointmentproject.domain.patient.repository.PatientRepository;
 import org.zerobase.hospitalappointmentproject.global.auth.service.UserValidationService;
 import org.zerobase.hospitalappointmentproject.global.exception.CustomException;
@@ -27,7 +27,6 @@ import org.zerobase.hospitalappointmentproject.global.util.PasswordUtils;
 public class PatientService {
 
   private final PatientRepository patientRepository;
-  private final PatientMapper patientMapper;
   private final UserValidationService userValidationService;
   private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
@@ -60,7 +59,7 @@ public class PatientService {
 
     PatientEntity patient = patientRepository.save(PatientSignup.Request.toEntity(request));
 
-    return patientMapper.toDto(patient);
+    return PatientDto.toDto(patient);
 
   }
 
@@ -72,9 +71,10 @@ public class PatientService {
   @Transactional
   public PatientDto getInfo(String username) {
 
-    PatientEntity patient = patientRepository.findByUsername(username);
+    PatientEntity patient = patientRepository.findByUsername(username)
+        .orElseThrow(() -> new CustomException(PATIENT_NOT_FOUND));
 
-    return patientMapper.toDto(patient);
+    return PatientDto.toDto(patient);
 
   }
 
@@ -96,7 +96,8 @@ public class PatientService {
       throw new CustomException(PASSWORD_IS_REQUIRED_TO_UPDATE_INFO);
     }
 
-    PatientEntity patient = patientRepository.findByUsername(username);
+    PatientEntity patient = patientRepository.findByUsername(username)
+        .orElseThrow(() -> new CustomException(PATIENT_NOT_FOUND));
 
     if (!bCryptPasswordEncoder.matches(request.getCurrentPassword(), patient.getPassword())) {
       throw new CustomException(CURRENT_PASSWORD_DOES_NOT_MATCH);
@@ -120,7 +121,7 @@ public class PatientService {
 
     PatientEntity updateEntity = patientRepository.save(request.toUpdateEntity(patient));
 
-    return patientMapper.toDto(updateEntity);
+    return PatientDto.toDto(updateEntity);
 
   }
 
@@ -133,7 +134,8 @@ public class PatientService {
   @Transactional
   public void deleteInfo(String username, String password) {
 
-    PatientEntity patient = patientRepository.findByUsername(username);
+    PatientEntity patient = patientRepository.findByUsername(username)
+        .orElseThrow(() -> new CustomException(PATIENT_NOT_FOUND));
 
     if (password == null || !bCryptPasswordEncoder.matches(password, patient.getPassword())) {
       throw new CustomException(PASSWORD_DOES_NOT_MATCH);
