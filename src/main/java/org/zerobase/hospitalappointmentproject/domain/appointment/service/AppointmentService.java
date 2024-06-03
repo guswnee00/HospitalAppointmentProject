@@ -22,6 +22,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -74,8 +75,7 @@ public class AppointmentService {
 
     checkValidTime(appointmentTime, hospital);
 
-    boolean isDoctorAvailable = appointmentRepository.existsByDoctorAndAppointmentDateAndAppointmentTime(doctor, request.getAppointmentDate(), appointmentTime);
-    if (isDoctorAvailable) {
+    if (appointmentRepository.existsByDoctorAndAppointmentDateAndAppointmentTime(doctor, request.getAppointmentDate(), appointmentTime)) {
       throw new CustomException(DOCTOR_IS_NOT_AVAILABLE);
     }
 
@@ -132,8 +132,7 @@ public class AppointmentService {
     );
     checkValidTime(appointmentTime, hospital);
 
-    boolean isDoctorAvailable = appointmentRepository.existsByDoctorAndAppointmentDateAndAppointmentTime(doctor, request.getAppointmentDate(), appointmentTime);
-    if (isDoctorAvailable) {
+    if (appointmentRepository.existsByDoctorAndAppointmentDateAndAppointmentTime(doctor, request.getAppointmentDate(), appointmentTime)) {
       throw new CustomException(DOCTOR_IS_NOT_AVAILABLE);
     }
 
@@ -172,9 +171,7 @@ public class AppointmentService {
     PatientEntity patient = patientRepository.findByUsername(username)
                                              .orElseThrow(() -> new CustomException(PATIENT_NOT_FOUND));
 
-    Page<AppointmentEntity> page = appointmentRepository.findByPatient(patient, pageable);
-
-    return page.map(AppointmentDto::toDto);
+    return appointmentRepository.findByPatient(patient, pageable).map(AppointmentDto::toDto);
 
   }
 
@@ -187,9 +184,8 @@ public class AppointmentService {
                                        .orElseThrow(() -> new CustomException(STAFF_NOT_FOUND));
 
     HospitalEntity hospital = staff.getHospital();
-    Page<AppointmentEntity> page = appointmentRepository.findByHospital(hospital, pageable);
 
-    return page.map(AppointmentDto::toDto);
+    return appointmentRepository.findByHospital(hospital, pageable).map(AppointmentDto::toDto);
 
   }
 
@@ -205,10 +201,9 @@ public class AppointmentService {
 
     List<AppointmentEntity> appointments = appointmentRepository.findByStatusAndAppointmentDateLessThanEqual(PENDING_APPOINTMENT, confirmationDate);
 
-    for (AppointmentEntity appointment: appointments) {
-      AppointmentEntity updateAppointment = appointment.toBuilder().status(CONFIRMED_APPOINTMENT).build();
-      appointmentRepository.save(updateAppointment);
-    }
+    appointmentRepository .saveAll(appointments.stream()
+        .map(appointment -> appointment.toBuilder().status(CONFIRMED_APPOINTMENT).build())
+        .collect(Collectors.toList()));
 
   }
 
