@@ -54,6 +54,8 @@ public class AppointmentCreate {
   @Builder
   public static class Response {
 
+    private Long appointmentId;
+
     private String hospitalName;
     private String specialtyName;
     private String doctorName;
@@ -68,6 +70,7 @@ public class AppointmentCreate {
     public static Response fromDto(AppointmentDto dto) {
 
       return Response.builder()
+          .appointmentId(dto.getId())
           .hospitalName(dto.getHospitalName())
           .specialtyName(dto.getSpecialtyName())
           .doctorName(dto.getDoctorName())
