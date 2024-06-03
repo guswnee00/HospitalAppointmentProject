@@ -10,7 +10,9 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -22,9 +24,9 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import org.zerobase.hospitalappointmentproject.domain.doctor.entity.DoctorEntity;
 import org.zerobase.hospitalappointmentproject.domain.hospital.entity.HospitalEntity;
 import org.zerobase.hospitalappointmentproject.domain.patient.entity.PatientEntity;
-import org.zerobase.hospitalappointmentproject.global.common.enumset.AppointmentStatus;
+import org.zerobase.hospitalappointmentproject.global.common.AppointmentStatus;
 
-@Builder
+@Builder(toBuilder = true)
 @Getter
 @ToString
 @NoArgsConstructor
@@ -37,7 +39,8 @@ public class AppointmentEntity {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
-  private LocalDateTime appointmentTime;
+  private LocalDate appointmentDate;
+  private LocalTime appointmentTime;
 
   @Enumerated(EnumType.STRING)
   private AppointmentStatus status;
