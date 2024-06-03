@@ -4,6 +4,7 @@ import static org.zerobase.hospitalappointmentproject.global.exception.ErrorCode
 import static org.zerobase.hospitalappointmentproject.global.exception.ErrorCode.INVALID_PASSWORD;
 import static org.zerobase.hospitalappointmentproject.global.exception.ErrorCode.NEW_PASSWORD_MUST_BE_DIFFERENT_FROM_CURRENT_ONE;
 import static org.zerobase.hospitalappointmentproject.global.exception.ErrorCode.PASSWORD_IS_REQUIRED_TO_UPDATE_INFO;
+import static org.zerobase.hospitalappointmentproject.global.exception.ErrorCode.STAFF_NOT_FOUND;
 import static org.zerobase.hospitalappointmentproject.global.exception.ErrorCode.TWO_PASSWORDS_DO_NOT_MATCH;
 import static org.zerobase.hospitalappointmentproject.global.exception.ErrorCode.USERNAME_ALREADY_IN_USE;
 
@@ -16,8 +17,6 @@ import org.zerobase.hospitalappointmentproject.domain.staff.dto.StaffDto;
 import org.zerobase.hospitalappointmentproject.domain.staff.dto.StaffInfoUpdate;
 import org.zerobase.hospitalappointmentproject.domain.staff.dto.StaffSignup;
 import org.zerobase.hospitalappointmentproject.domain.staff.entity.StaffEntity;
-import org.zerobase.hospitalappointmentproject.domain.staff.mapper.CustomStaffMapper;
-import org.zerobase.hospitalappointmentproject.domain.staff.mapper.StaffMapper;
 import org.zerobase.hospitalappointmentproject.domain.staff.repository.StaffRepository;
 import org.zerobase.hospitalappointmentproject.global.auth.service.UserValidationService;
 import org.zerobase.hospitalappointmentproject.global.exception.CustomException;
@@ -29,8 +28,6 @@ import org.zerobase.hospitalappointmentproject.global.util.PasswordUtils;
 public class StaffService {
 
   private final StaffRepository staffRepository;
-  private final StaffMapper staffMapper;
-  private final CustomStaffMapper customStaffMapper;
   private final UserValidationService userValidationService;
   private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
@@ -63,7 +60,7 @@ public class StaffService {
 
     StaffEntity staff = staffRepository.save(StaffSignup.Request.toEntity(request));
 
-    return staffMapper.toDto(staff);
+    return StaffDto.toDto(staff);
 
   }
 
@@ -75,9 +72,10 @@ public class StaffService {
   @Transactional
   public StaffDto getInfo(String username) {
 
-    StaffEntity staff = staffRepository.findByUsername(username);
+    StaffEntity staff = staffRepository.findByUsername(username)
+                                      .orElseThrow(() -> new CustomException(STAFF_NOT_FOUND));
 
-    return customStaffMapper.toDto(staff);
+    return StaffDto.toDto(staff);
 
   }
 
@@ -99,7 +97,8 @@ public class StaffService {
       throw new CustomException(PASSWORD_IS_REQUIRED_TO_UPDATE_INFO);
     }
 
-    StaffEntity staff = staffRepository.findByUsername(username);
+    StaffEntity staff = staffRepository.findByUsername(username)
+                                        .orElseThrow(() -> new CustomException(STAFF_NOT_FOUND));
 
     if (!bCryptPasswordEncoder.matches(request.getCurrentPassword(), staff.getPassword())) {
       throw new CustomException(CURRENT_PASSWORD_DOES_NOT_MATCH);
@@ -123,36 +122,8 @@ public class StaffService {
 
     StaffEntity updateEntity = staffRepository.save(request.toUpdateEntity(staff));
 
-    return staffMapper.toDto(updateEntity);
+    return StaffDto.toDto(updateEntity);
 
   }
-
-  // TODO
-  //  - 병원 관계자의 병원 등록, 수정, 삭제
-
-  /**
-   * 병원 관계자의 병원 등록
-   *    1. 아이디로 엔티티 가져오기
-   *        A. staff.getHospital() != null (이미 병원 등록)
-   *            a. CustomException 발생 -> 이미 병원이 등록된 상태입니다.
-   *        B. 병원 등록이 안되어 있다면 병원 등록 진행
-   *            a. 동일한 병원 이름이 있다면
-   *                i. CustomException 발생 -> 동일한 병원 이름이 존재합니다.
-   *            b. 동일한 병원 이름이 없다면 등록
-   *    2. dto 반환
-   *
-   *    public HospitalDto registerHospital(String username, RegisterHospital.Request request) {
-   *
-   *     StaffEntity staff = staffRepository.findByUsername(username);
-   *     if (staff.getHospital() != null) {
-   *       throw new
-   *     }
-   *
-   *   }
-   *
-   */
-
-
-
 
 }
