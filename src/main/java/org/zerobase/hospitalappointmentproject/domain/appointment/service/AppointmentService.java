@@ -186,38 +186,22 @@ public class AppointmentService {
   }
 
   /**
-   * 병원 관계자의 예약 확정 처리
-   *    1. 병원 관계자의 아이디로 병원 엔티티 가져오기
-   *    2. 예약 날짜 3일 전(오늘로부터 3일뒤 예약 내역들)에 '예약 확정' 처리
-   *    3. 업데이트된 예약 상태 저장
+   * 예약 확정 처리
+   *    모든 병원들이 오전 9시에 '예약 확정' 처리를 자동으로 할 수 있도록 scheduling
    */
   @Transactional
-  public void confirmAppointment(String username) {
+  public void confirmAppointmentsForAllHospitals() {
 
-    StaffEntity staff = staffRepository.findByUsername(username)
-                                       .orElseThrow(() -> new CustomException(STAFF_NOT_FOUND));
-
-    HospitalEntity hospital = staff.getHospital();
     LocalDate today = LocalDate.now();
     LocalDate confirmationDate = today.plusDays(3);
 
-    List<AppointmentEntity> appointments = appointmentRepository.findByHospitalAndStatusAndAppointmentDateLessThanEqual(hospital, PENDING_APPOINTMENT, confirmationDate);
+    List<AppointmentEntity> appointments = appointmentRepository.findByStatusAndAppointmentDateLessThanEqual(PENDING_APPOINTMENT, confirmationDate);
+
     for (AppointmentEntity appointment: appointments) {
       AppointmentEntity updateAppointment = appointment.toBuilder().status(CONFIRMED_APPOINTMENT).build();
       appointmentRepository.save(updateAppointment);
     }
 
-  }
-
-  /**
-   * 모든 병원들이 오전 9시에 예약 확정처리를 자동으로 할 수 있도록 scheduling
-   */
-  @Transactional
-  public void confirmAppointmentsForAllHospitals() {
-    List<StaffEntity> staffs = staffRepository.findAll();
-    for (StaffEntity staff: staffs) {
-      confirmAppointment(staff.getUsername());
-    }
   }
 
   /**
@@ -237,13 +221,13 @@ public class AppointmentService {
     AppointmentEntity appointment = appointmentRepository.findByIdAndPatient(appointmentId, patient)
                                                          .orElseThrow(() -> new CustomException(APPOINTMENT_NOT_FOUND));
 
-    CheckPatientArrival(appointment);
+    checkPatientArrival(appointment);
 
     appointmentRepository.save(appointment.toBuilder().status(WAITING_CONSULTATION).build());
 
   }
 
-  private void CheckPatientArrival(AppointmentEntity appointment) {
+  private void checkPatientArrival(AppointmentEntity appointment) {
 
     LocalDate today = LocalDate.now();
     LocalTime now = LocalTime.now();
