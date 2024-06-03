@@ -1,11 +1,13 @@
 package org.zerobase.hospitalappointmentproject.domain.hospital.dto;
 
 import java.time.LocalTime;
+import java.util.Optional;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.zerobase.hospitalappointmentproject.domain.hospital.entity.HospitalEntity;
 
 public class HospitalInfoUpdate {
 
@@ -24,6 +26,21 @@ public class HospitalInfoUpdate {
     private LocalTime closeTime;
     private LocalTime lunchStartTime;
     private LocalTime lunchEndTime;
+
+    public HospitalEntity toUpdateEntity(HospitalEntity entity) {
+
+      HospitalEntity.HospitalEntityBuilder<?, ?> builder = entity.toBuilder();
+
+      Optional.ofNullable(this.contactNumber).ifPresent(builder::contactNumber);
+      Optional.ofNullable(this.description).ifPresent(builder::description);
+      Optional.ofNullable(this.openTime).ifPresent(builder::openTime);
+      Optional.ofNullable(this.closeTime).ifPresent(builder::closeTime);
+      Optional.ofNullable(this.lunchStartTime).ifPresent(builder::lunchStartTime);
+      Optional.ofNullable(this.lunchEndTime).ifPresent(builder::lunchEndTime);
+
+      return builder.build();
+
+    }
 
   }
 
