@@ -91,7 +91,7 @@ class AppointmentServiceTest {
     when(patientRepository.findByUsername(username)).thenReturn(Optional.of(patient));
     when(hospitalRepository.findByName(request.getHospitalName())).thenReturn(Optional.of(hospital));
     when(doctorRepository.findByNameAndSpecialty_NameAndHospital(request.getDoctorName(), request.getSpecialtyName(), hospital)).thenReturn(Optional.of(doctor));
-    when(appointmentRepository.existsByDoctorAndAppointmentDateAndAppointmentTime(doctor, request.getAppointmentDate(), appointment.getAppointmentTime())).thenReturn(false);
+    when(appointmentRepository.findByDoctorAndAppointmentDateAndAppointmentTimeWithLock(doctor, request.getAppointmentDate(), appointment.getAppointmentTime())).thenReturn(Optional.empty());
     when(appointmentRepository.save(any(AppointmentEntity.class))).thenReturn(appointment);
 
     AppointmentDto appointmentDto = appointmentService.create(request, username);
@@ -101,6 +101,7 @@ class AppointmentServiceTest {
     assertEquals(request.getDoctorName(), appointmentDto.getDoctorName());
     assertEquals(request.getAppointmentDate(), appointmentDto.getAppointmentDate());
     assertEquals(appointment.getAppointmentTime(), appointmentDto.getAppointmentTime());
+
   }
 
   @Test
@@ -195,12 +196,13 @@ class AppointmentServiceTest {
     when(patientRepository.findByUsername(username)).thenReturn(Optional.of(patient));
     when(hospitalRepository.findByName(request.getHospitalName())).thenReturn(Optional.of(hospital));
     when(doctorRepository.findByNameAndSpecialty_NameAndHospital(request.getDoctorName(), request.getSpecialtyName(), hospital))
-                         .thenReturn(Optional.of(doctor));
-    when(appointmentRepository.existsByDoctorAndAppointmentDateAndAppointmentTime(doctor, request.getAppointmentDate(), appointmentTime))
-                              .thenReturn(true);
+        .thenReturn(Optional.of(doctor));
+    when(appointmentRepository.findByDoctorAndAppointmentDateAndAppointmentTimeWithLock(doctor, request.getAppointmentDate(), appointmentTime))
+        .thenReturn(Optional.of(AppointmentEntity.builder().doctor(doctor).appointmentDate(request.getAppointmentDate()).appointmentTime(appointmentTime).build()));
 
     CustomException exception = assertThrows(CustomException.class,
         () -> appointmentService.create(request, username));
+
 
     assertEquals(DOCTOR_IS_NOT_AVAILABLE.getDescription(), exception.getMessage());
 

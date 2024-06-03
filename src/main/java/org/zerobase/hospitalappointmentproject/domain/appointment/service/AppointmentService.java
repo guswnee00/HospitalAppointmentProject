@@ -75,7 +75,7 @@ public class AppointmentService {
 
     checkValidTime(appointmentTime, hospital);
 
-    if (appointmentRepository.existsByDoctorAndAppointmentDateAndAppointmentTime(doctor, request.getAppointmentDate(), appointmentTime)) {
+    if (appointmentRepository.findByDoctorAndAppointmentDateAndAppointmentTimeWithLock(doctor, request.getAppointmentDate(), appointmentTime).isPresent()) {
       throw new CustomException(DOCTOR_IS_NOT_AVAILABLE);
     }
 
