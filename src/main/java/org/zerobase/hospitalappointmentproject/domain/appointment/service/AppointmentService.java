@@ -21,6 +21,7 @@ import static org.zerobase.hospitalappointmentproject.global.exception.ErrorCode
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -37,9 +38,10 @@ import org.zerobase.hospitalappointmentproject.domain.hospital.entity.HospitalEn
 import org.zerobase.hospitalappointmentproject.domain.hospital.repository.HospitalRepository;
 import org.zerobase.hospitalappointmentproject.domain.patient.entity.PatientEntity;
 import org.zerobase.hospitalappointmentproject.domain.patient.repository.PatientRepository;
-import org.zerobase.hospitalappointmentproject.domain.specialty.repository.SpecialtyRepository;
 import org.zerobase.hospitalappointmentproject.domain.staff.entity.StaffEntity;
 import org.zerobase.hospitalappointmentproject.domain.staff.repository.StaffRepository;
+import org.zerobase.hospitalappointmentproject.global.common.Hour;
+import org.zerobase.hospitalappointmentproject.global.common.Minute;
 import org.zerobase.hospitalappointmentproject.global.exception.CustomException;
 
 @Service
@@ -51,7 +53,6 @@ public class AppointmentService {
   private final HospitalRepository hospitalRepository;
   private final DoctorRepository doctorRepository;
   private final StaffRepository staffRepository;
-  private final SpecialtyRepository specialtyRepository;
 
   /**
    * 환자의 병원 예약 생성
@@ -111,17 +112,24 @@ public class AppointmentService {
                                              .orElseThrow(() -> new CustomException(PATIENT_NOT_FOUND));
     AppointmentEntity appointment = appointmentRepository.findByIdAndPatient(appointmentId, patient)
                                                          .orElseThrow(() -> new CustomException(APPOINTMENT_NOT_FOUND));
-    HospitalEntity hospital = hospitalRepository.findByName(request.getHospitalName())
-                                                .orElseThrow(() -> new CustomException(HOSPITAL_NOT_FOUND));
-    DoctorEntity doctor = doctorRepository.findByName(request.getDoctorName())
-                                          .orElseThrow(() -> new CustomException(DOCTOR_NOT_FOUND));
+    HospitalEntity hospital = request.getHospitalName() != null ?
+                                      hospitalRepository.findByName(request.getHospitalName())
+                                      .orElseThrow(() -> new CustomException(HOSPITAL_NOT_FOUND))
+                                      : appointment.getHospital();
+    DoctorEntity doctor = request.getDoctorName() != null ?
+                                  doctorRepository.findByNameAndSpecialty_NameAndHospital(request.getDoctorName(), request.getSpecialtyName(), hospital)
+                                  .orElseThrow(() -> new CustomException(DOCTOR_NOT_FOUND))
+                                  : appointment.getDoctor();
 
     if (appointment.getStatus() != PENDING_APPOINTMENT) {
       throw new CustomException(CANNOT_MODIFICATION);
     }
 
-    LocalTime appointmentTime = LocalTime.of(request.getAppointmentHour().getHour(), request.getAppointmentMinute().getMinute());
 
+    LocalTime appointmentTime = LocalTime.of(
+        Optional.ofNullable(request.getAppointmentHour()).map(Hour::getHour).orElse(appointment.getAppointmentTime().getHour()),
+        Optional.ofNullable(request.getAppointmentMinute()).map(Minute::getMinute).orElse(appointment.getAppointmentTime().getMinute())
+    );
     checkValidTime(appointmentTime, hospital);
 
     boolean isDoctorAvailable = appointmentRepository.existsByDoctorAndAppointmentDateAndAppointmentTime(doctor, request.getAppointmentDate(), appointmentTime);
@@ -129,7 +137,7 @@ public class AppointmentService {
       throw new CustomException(DOCTOR_IS_NOT_AVAILABLE);
     }
 
-    AppointmentEntity updateAppointment = appointmentRepository.save(request.toUpdateEntity(appointment, hospitalRepository, doctorRepository, specialtyRepository));
+    AppointmentEntity updateAppointment = appointmentRepository.save(request.toUpdateEntity(appointment, hospital, doctor));
 
     return AppointmentDto.toDto(updateAppointment);
 

@@ -1,9 +1,5 @@
 package org.zerobase.hospitalappointmentproject.domain.appointment.dto;
 
-import static org.zerobase.hospitalappointmentproject.global.exception.ErrorCode.DOCTOR_NOT_FOUND;
-import static org.zerobase.hospitalappointmentproject.global.exception.ErrorCode.HOSPITAL_NOT_FOUND;
-import static org.zerobase.hospitalappointmentproject.global.exception.ErrorCode.SPECIALTY_NOT_FOUND;
-
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -15,14 +11,10 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.zerobase.hospitalappointmentproject.domain.appointment.entity.AppointmentEntity;
 import org.zerobase.hospitalappointmentproject.domain.doctor.entity.DoctorEntity;
-import org.zerobase.hospitalappointmentproject.domain.doctor.repository.DoctorRepository;
 import org.zerobase.hospitalappointmentproject.domain.hospital.entity.HospitalEntity;
-import org.zerobase.hospitalappointmentproject.domain.hospital.repository.HospitalRepository;
-import org.zerobase.hospitalappointmentproject.domain.specialty.repository.SpecialtyRepository;
 import org.zerobase.hospitalappointmentproject.global.common.AppointmentStatus;
 import org.zerobase.hospitalappointmentproject.global.common.Hour;
 import org.zerobase.hospitalappointmentproject.global.common.Minute;
-import org.zerobase.hospitalappointmentproject.global.exception.CustomException;
 
 public class AppointmentUpdate {
 
@@ -40,30 +32,15 @@ public class AppointmentUpdate {
     private Hour appointmentHour;
     private Minute appointmentMinute;
 
-    public AppointmentEntity toUpdateEntity(AppointmentEntity entity, HospitalRepository hospitalRepository, DoctorRepository doctorRepository, SpecialtyRepository specialtyRepository) {
+    public AppointmentEntity toUpdateEntity(AppointmentEntity appointment, HospitalEntity hospital, DoctorEntity doctor) {
 
-      AppointmentEntity.AppointmentEntityBuilder builder = entity.toBuilder();
-
-      Optional.ofNullable(this.hospitalName).ifPresent(name -> {
-        HospitalEntity hospital = hospitalRepository.findByName(name)
-            .orElseThrow(() -> new CustomException(HOSPITAL_NOT_FOUND));
-        builder.hospital(hospital);
-      });
-
-      Optional.ofNullable(this.specialtyName).ifPresent(name -> {
-        specialtyRepository.findByName(name)
-            .orElseThrow(() -> new CustomException(SPECIALTY_NOT_FOUND));
-      });
-
-      Optional.ofNullable(this.doctorName).ifPresent(name -> {
-        DoctorEntity doctor = doctorRepository.findByNameAndSpecialty_NameAndHospital(name, this.specialtyName, entity.getHospital())
-            .orElseThrow(() -> new CustomException(DOCTOR_NOT_FOUND));
-        builder.doctor(doctor);
-      });
+      AppointmentEntity.AppointmentEntityBuilder builder = appointment.toBuilder();
+      builder.hospital(hospital);
+      builder.doctor(doctor);
 
       Optional.ofNullable(this.appointmentDate).ifPresent(builder::appointmentDate);
 
-      LocalTime beforeChange = entity.getAppointmentTime();
+      LocalTime beforeChange = appointment.getAppointmentTime();
       int updateHour = Optional.ofNullable(this.appointmentHour).map(Hour::getHour)
                                .orElse(beforeChange.getHour());
       int updateMinute = Optional.ofNullable(this.appointmentMinute).map(Minute::getMinute)
