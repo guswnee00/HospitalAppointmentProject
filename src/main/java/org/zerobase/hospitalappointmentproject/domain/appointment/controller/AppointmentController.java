@@ -82,13 +82,6 @@ public class AppointmentController {
     return ResponseEntity.ok(appointments);
   }
 
-  @PostMapping("/staff/confirm-appointment")
-  public ResponseEntity<?> confirmAppointment(@AuthenticationPrincipal UserDetails userDetails) {
-    String username = userDetails.getUsername();
-    appointmentService.confirmAppointment(username);
-    return ResponseEntity.ok("예약 확정 처리가 완료되었습니다.");
-  }
-
   @PostMapping("/patient/check-arrival/{appointmentId}")
   public ResponseEntity<?> patientArrival(@AuthenticationPrincipal UserDetails userDetails,
                                           @PathVariable Long appointmentId
