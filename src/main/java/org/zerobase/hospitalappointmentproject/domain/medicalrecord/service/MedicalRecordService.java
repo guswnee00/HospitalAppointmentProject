@@ -6,6 +6,8 @@ import static org.zerobase.hospitalappointmentproject.global.exception.ErrorCode
 import static org.zerobase.hospitalappointmentproject.global.exception.ErrorCode.PATIENT_NOT_FOUND;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.zerobase.hospitalappointmentproject.domain.appointment.repository.AppointmentRepository;
@@ -65,13 +67,25 @@ public class MedicalRecordService {
   public MedicalRecordDto update(MedicalRecordUpdate.Request request, String username, Long medicalRecordId) {
 
     DoctorEntity doctor = doctorRepository.findByUsername(username)
-        .orElseThrow(() -> new CustomException(DOCTOR_NOT_FOUND));
+                                          .orElseThrow(() -> new CustomException(DOCTOR_NOT_FOUND));
     MedicalRecordEntity medicalRecord = medicalRecordRepository.findByIdAndDoctor(medicalRecordId, doctor)
-        .orElseThrow(() -> new CustomException(MEDICAL_RECORD_NOT_FOUND));
+                                                               .orElseThrow(() -> new CustomException(MEDICAL_RECORD_NOT_FOUND));
 
     MedicalRecordEntity updateMedicalRecord = medicalRecordRepository.save(request.toUpdateEntity(medicalRecord));
 
     return MedicalRecordDto.toDto(updateMedicalRecord);
+
+  }
+
+  /**
+   * 의사의 진료 기록 조회
+   */
+  public Page<MedicalRecordDto> doctorMedicalRecords(String username, Pageable pageable) {
+
+    DoctorEntity doctor = doctorRepository.findByUsername(username)
+                                             .orElseThrow(() -> new CustomException(DOCTOR_NOT_FOUND));
+
+    return medicalRecordRepository.findAllByDoctor(doctor, pageable).map(MedicalRecordDto::toDto);
 
   }
 
