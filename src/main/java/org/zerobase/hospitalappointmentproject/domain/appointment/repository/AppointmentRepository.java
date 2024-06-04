@@ -31,5 +31,6 @@ public interface AppointmentRepository extends JpaRepository<AppointmentEntity, 
   Optional<AppointmentEntity> findByDoctorAndAppointmentDateAndAppointmentTimeWithLock(@Param("doctor") DoctorEntity doctor,
                                                                                        @Param("appointmentDate") LocalDate date,
                                                                                        @Param("appointmentTime") LocalTime time);
+  Optional<AppointmentEntity> findByPatientAndDoctorAndAppointmentDate(PatientEntity patient, DoctorEntity doctor, LocalDate date);
 
 }
