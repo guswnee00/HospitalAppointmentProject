@@ -2,6 +2,7 @@ package org.zerobase.hospitalappointmentproject.domain.medicalrecord.service;
 
 import static org.zerobase.hospitalappointmentproject.global.common.AppointmentStatus.COMPLETE_CONSULTATION;
 import static org.zerobase.hospitalappointmentproject.global.exception.ErrorCode.DOCTOR_NOT_FOUND;
+import static org.zerobase.hospitalappointmentproject.global.exception.ErrorCode.MEDICAL_RECORD_NOT_FOUND;
 import static org.zerobase.hospitalappointmentproject.global.exception.ErrorCode.PATIENT_NOT_FOUND;
 
 import lombok.RequiredArgsConstructor;
@@ -12,6 +13,7 @@ import org.zerobase.hospitalappointmentproject.domain.doctor.entity.DoctorEntity
 import org.zerobase.hospitalappointmentproject.domain.doctor.repository.DoctorRepository;
 import org.zerobase.hospitalappointmentproject.domain.medicalrecord.dto.MedicalRecordCreate;
 import org.zerobase.hospitalappointmentproject.domain.medicalrecord.dto.MedicalRecordDto;
+import org.zerobase.hospitalappointmentproject.domain.medicalrecord.dto.MedicalRecordUpdate;
 import org.zerobase.hospitalappointmentproject.domain.medicalrecord.entity.MedicalRecordEntity;
 import org.zerobase.hospitalappointmentproject.domain.medicalrecord.repository.MedicalRecordRepository;
 import org.zerobase.hospitalappointmentproject.domain.patient.entity.PatientEntity;
@@ -45,10 +47,31 @@ public class MedicalRecordService {
 
     MedicalRecordEntity medicalRecord = medicalRecordRepository.save(MedicalRecordCreate.Request.toEntity(request, patient, doctor));
 
-    appointmentRepository.findByPatientAndDoctorAndAndAppointmentDate(patient, doctor, request.getConsultationDate())
+    appointmentRepository.findByPatientAndDoctorAndAppointmentDate(patient, doctor, request.getConsultationDate())
         .ifPresent(appointmentRepository.save(appointment -> appointment.toBuilder().status(COMPLETE_CONSULTATION).build()));
 
     return MedicalRecordDto.toDto(medicalRecord);
+
+  }
+
+  /**
+   * 의사의 진료 기록 수정
+   *    1. 의사의 아이디로 의사 엔티티 가져오기
+   *    2. 진료기록 id와 의사 엔티티로 진료기록 엔티티 가져오기
+   *    3. 업데이트 후 저장
+   *    4. dto 반환
+   */
+  @Transactional
+  public MedicalRecordDto update(MedicalRecordUpdate.Request request, String username, Long medicalRecordId) {
+
+    DoctorEntity doctor = doctorRepository.findByUsername(username)
+        .orElseThrow(() -> new CustomException(DOCTOR_NOT_FOUND));
+    MedicalRecordEntity medicalRecord = medicalRecordRepository.findByIdAndDoctor(medicalRecordId, doctor)
+        .orElseThrow(() -> new CustomException(MEDICAL_RECORD_NOT_FOUND));
+
+    MedicalRecordEntity updateMedicalRecord = medicalRecordRepository.save(request.toUpdateEntity(medicalRecord));
+
+    return MedicalRecordDto.toDto(updateMedicalRecord);
 
   }
 
