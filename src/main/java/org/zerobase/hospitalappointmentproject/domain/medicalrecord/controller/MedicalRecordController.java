@@ -47,7 +47,7 @@ public class MedicalRecordController {
   }
 
   @GetMapping("/doctor/medical-record")
-  public ResponseEntity<?> doctorMedicalRecord(@AuthenticationPrincipal UserDetails userDetails,
+  public ResponseEntity<?> doctorMedicalRecords(@AuthenticationPrincipal UserDetails userDetails,
                                                 @RequestParam(required = false, defaultValue = "consultationDate") String sortBy,
                                                 @RequestParam(required = false, defaultValue = "asc") String sortDirection,
                                                 @PageableDefault Pageable pageable
@@ -56,6 +56,19 @@ public class MedicalRecordController {
     Sort.Direction direction = Sort.Direction.fromString(sortDirection);
     Pageable sortPage = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), Sort.by(direction, sortBy));
     Page<MedicalRecordDto> medicalRecords = medicalRecordService.doctorMedicalRecords(username, sortPage);
+    return ResponseEntity.ok(medicalRecords);
+  }
+
+  @GetMapping("/patient/medical-record")
+  public ResponseEntity<?> patientMedicalRecords(@AuthenticationPrincipal UserDetails userDetails,
+                                                 @RequestParam(required = false, defaultValue = "consultationDate") String sortBy,
+                                                 @RequestParam(required = false, defaultValue = "asc") String sortDirection,
+                                                 @PageableDefault Pageable pageable
+  ) {
+    String username = userDetails.getUsername();
+    Sort.Direction direction = Sort.Direction.fromString(sortDirection);
+    Pageable sortPage = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), Sort.by(direction, sortBy));
+    Page<MedicalRecordDto> medicalRecords = medicalRecordService.patientMedicalRecords(username, sortPage);
     return ResponseEntity.ok(medicalRecords);
   }
 

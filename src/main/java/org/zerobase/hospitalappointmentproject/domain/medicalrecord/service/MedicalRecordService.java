@@ -89,4 +89,16 @@ public class MedicalRecordService {
 
   }
 
+  /**
+   * 환자의 진료 기록 조회
+   */
+  public Page<MedicalRecordDto> patientMedicalRecords(String username, Pageable pageable) {
+
+    PatientEntity patient = patientRepository.findByUsername(username)
+                                             .orElseThrow(() -> new CustomException(PATIENT_NOT_FOUND));
+
+    return medicalRecordRepository.findAllByPatient(patient, pageable).map(MedicalRecordDto::toDto);
+
+  }
+
 }
