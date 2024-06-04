@@ -20,6 +20,7 @@ import org.zerobase.hospitalappointmentproject.domain.medicalrecord.dto.MedicalR
 import org.zerobase.hospitalappointmentproject.domain.medicalrecord.dto.MedicalRecordDto;
 import org.zerobase.hospitalappointmentproject.domain.medicalrecord.dto.MedicalRecordUpdate;
 import org.zerobase.hospitalappointmentproject.domain.medicalrecord.service.MedicalRecordService;
+import org.zerobase.hospitalappointmentproject.global.common.MedicalRecordSortBy;
 
 @RestController
 @RequiredArgsConstructor
@@ -61,13 +62,14 @@ public class MedicalRecordController {
 
   @GetMapping("/patient/medical-record")
   public ResponseEntity<?> patientMedicalRecords(@AuthenticationPrincipal UserDetails userDetails,
-                                                 @RequestParam(required = false, defaultValue = "consultationDate") String sortBy,
+                                                 @RequestParam(required = false, defaultValue = "CONSULTATION_DATE") String sortBy,
                                                  @RequestParam(required = false, defaultValue = "asc") String sortDirection,
                                                  @PageableDefault Pageable pageable
   ) {
     String username = userDetails.getUsername();
     Sort.Direction direction = Sort.Direction.fromString(sortDirection);
-    Pageable sortPage = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), Sort.by(direction, sortBy));
+    MedicalRecordSortBy medicalRecordSortBy = MedicalRecordSortBy.fromField(sortBy);
+    Pageable sortPage = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), Sort.by(direction, medicalRecordSortBy.getField()));
     Page<MedicalRecordDto> medicalRecords = medicalRecordService.patientMedicalRecords(username, sortPage);
     return ResponseEntity.ok(medicalRecords);
   }
