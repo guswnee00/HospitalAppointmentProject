@@ -25,6 +25,7 @@ public interface AppointmentRepository extends JpaRepository<AppointmentEntity, 
   Optional<AppointmentEntity> findByIdAndPatient(Long id, PatientEntity patient);
   Page<AppointmentEntity> findByPatient(PatientEntity patient, Pageable pageable);
   Page<AppointmentEntity> findByHospital(HospitalEntity hospital, Pageable pageable);
+  Page<AppointmentEntity> findByDoctor(DoctorEntity doctor, Pageable pageable);
   List<AppointmentEntity> findByStatusAndAppointmentDateLessThanEqual(AppointmentStatus status, LocalDate date);
   @Lock(LockModeType.PESSIMISTIC_WRITE)
   @Query("SELECT a FROM Appointment a WHERE a.doctor = :doctor AND a.appointmentDate = :appointmentDate AND a.appointmentTime = :appointmentTime")
