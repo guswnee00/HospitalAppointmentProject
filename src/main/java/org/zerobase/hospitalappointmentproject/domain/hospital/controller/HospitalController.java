@@ -58,6 +58,13 @@ public class HospitalController {
     return ResponseEntity.ok(specialties);
   }
 
+  @GetMapping("/search/{specialtyName}")
+  public ResponseEntity<?> searchBySpecialtyName(@PathVariable String specialtyName) {
+    List<HospitalDto> hospitalDtos = hospitalService.searchBySpecialtyName(specialtyName);
+    List<HospitalInfoResponse> hospitalInfoResponses = hospitalDtos.stream().map(HospitalInfoResponse::fromDto).toList();
+    return ResponseEntity.ok(hospitalInfoResponses);
+  }
+
   @GetMapping("/search/{hospitalName}")
   public ResponseEntity<?> searchByHospitalName(@PathVariable String hospitalName) {
     HospitalDto hospitalDto = hospitalService.searchByHospitalName(hospitalName);
