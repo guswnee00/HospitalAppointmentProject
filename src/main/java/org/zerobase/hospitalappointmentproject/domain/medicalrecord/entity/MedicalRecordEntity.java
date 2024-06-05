@@ -16,7 +16,7 @@ import lombok.ToString;
 import org.zerobase.hospitalappointmentproject.domain.doctor.entity.DoctorEntity;
 import org.zerobase.hospitalappointmentproject.domain.patient.entity.PatientEntity;
 
-@Builder
+@Builder(toBuilder = true)
 @Getter
 @ToString
 @NoArgsConstructor
