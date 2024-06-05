@@ -51,7 +51,7 @@ class AppointmentServiceTest {
   private AppointmentService appointmentService;
 
   @Test
-  void successCreateAppointment() {
+  void successCreate() {
 
     String username = "testPatient";
     AppointmentCreate.Request request = new AppointmentCreate.Request();
@@ -105,7 +105,7 @@ class AppointmentServiceTest {
   }
 
   @Test
-  void failCreateAppointment_patientNotFound() {
+  void failCreate_patientNotFound() {
 
     String username = "patientUsername";
     AppointmentCreate.Request request = new AppointmentCreate.Request();
@@ -120,7 +120,7 @@ class AppointmentServiceTest {
   }
 
   @Test
-  void failCreateAppointment_hospitalNotFound() {
+  void failCreate_hospitalNotFound() {
 
     String username = "testUsername";
     AppointmentCreate.Request request = new AppointmentCreate.Request();
@@ -139,7 +139,7 @@ class AppointmentServiceTest {
   }
 
   @Test
-  void failCreateAppointment_doctorNotFound() {
+  void failCreate_doctorNotFound() {
 
     String username = "testPatient";
     AppointmentCreate.Request request = new AppointmentCreate.Request();
@@ -165,7 +165,7 @@ class AppointmentServiceTest {
   }
 
   @Test
-  void failCreateAppointment_doctorNotAvailable() {
+  void failCreate_doctorNotAvailable() {
 
     String username = "testPatient";
     AppointmentCreate.Request request = new AppointmentCreate.Request();
@@ -209,7 +209,7 @@ class AppointmentServiceTest {
   }
 
   @Test
-  void failCreateAppointment_notHospitalOperatingHour() {
+  void failCreate_notHospitalOperatingHour() {
 
     String username = "testPatient";
     AppointmentCreate.Request request = new AppointmentCreate.Request();
@@ -248,7 +248,7 @@ class AppointmentServiceTest {
   }
 
   @Test
-  void failCreateAppointment_breakTimeForLunch() {
+  void failCreate_breakTimeForLunch() {
 
     String username = "testPatient";
     AppointmentCreate.Request request = new AppointmentCreate.Request();
@@ -287,5 +287,6 @@ class AppointmentServiceTest {
     assertEquals(BREAK_TIME_FOR_LUNCH.getDescription(), exception.getMessage());
 
   }
+
 }
 
