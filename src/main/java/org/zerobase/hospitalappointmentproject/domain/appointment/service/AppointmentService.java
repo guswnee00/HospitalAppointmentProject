@@ -190,6 +190,19 @@ public class AppointmentService {
   }
 
   /**
+   * 의사의 예약 목록 확인
+   */
+  public Page<AppointmentDto> doctorAppointments(String username, Pageable pageable) {
+
+    DoctorEntity doctor = doctorRepository.findByUsername(username)
+                                          .orElseThrow(() -> new CustomException(DOCTOR_NOT_FOUND));
+
+    return appointmentRepository.findByDoctor(doctor, pageable).map(AppointmentDto::toDto);
+
+  }
+
+
+  /**
    * 예약 확정 처리
    *    모든 병원들이 오전 9시에 '예약 확정' 처리를 자동으로 할 수 있도록 scheduling
    */
