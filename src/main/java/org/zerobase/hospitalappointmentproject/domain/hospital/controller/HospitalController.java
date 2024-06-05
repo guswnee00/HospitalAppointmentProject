@@ -1,5 +1,6 @@
 package org.zerobase.hospitalappointmentproject.domain.hospital.controller;
 
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -51,9 +52,15 @@ public class HospitalController {
     return ResponseEntity.ok("병원 삭제가 완료되었습니다.");
   }
 
+  @GetMapping("/search/{hospitalName}/specialties")
+  public ResponseEntity<?> specialtyList(@PathVariable String hospitalName) {
+    List<String> specialties = hospitalService.specialtyList(hospitalName);
+    return ResponseEntity.ok(specialties);
+  }
+
   @GetMapping("/search/{hospitalName}")
-  public ResponseEntity<?> getInfo(@PathVariable String hospitalName) {
-    HospitalDto hospitalDto = hospitalService.getInfo(hospitalName);
+  public ResponseEntity<?> searchByHospitalName(@PathVariable String hospitalName) {
+    HospitalDto hospitalDto = hospitalService.searchByHospitalName(hospitalName);
     return ResponseEntity.ok(HospitalInfoResponse.fromDto(hospitalDto));
   }
 
