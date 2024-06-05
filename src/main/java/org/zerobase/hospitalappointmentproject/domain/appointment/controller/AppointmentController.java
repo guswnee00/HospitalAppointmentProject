@@ -56,7 +56,7 @@ public class AppointmentController {
     return ResponseEntity.ok("예약 취소가 완료되었습니다.");
   }
 
-  @GetMapping("/patient/my-appointment")
+  @GetMapping("/patient/my-appointments")
   public ResponseEntity<?> patientAppointments(@AuthenticationPrincipal UserDetails userDetails,
                                                @RequestParam(required = false, defaultValue = "appointmentDate") String sortBy,
                                                @RequestParam(required = false, defaultValue = "asc") String sortDirection,
@@ -69,7 +69,7 @@ public class AppointmentController {
     return ResponseEntity.ok(appointments);
   }
 
-  @GetMapping("/staff/my-hospital-appointment")
+  @GetMapping("/staff/my-hospital-appointments")
   public ResponseEntity<?> staffAppointments(@AuthenticationPrincipal UserDetails userDetails,
                                              @RequestParam(required = false, defaultValue = "appointmentDate") String sortBy,
                                              @RequestParam(required = false, defaultValue = "asc") String sortDirection,
@@ -79,6 +79,19 @@ public class AppointmentController {
     Sort.Direction direction = Sort.Direction.fromString(sortDirection);
     Pageable sortPage = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), Sort.by(direction, sortBy));
     Page<AppointmentDto> appointments = appointmentService.staffAppointments(username, sortPage);
+    return ResponseEntity.ok(appointments);
+  }
+
+  @GetMapping("/doctor/my-appointments")
+  public ResponseEntity<?> doctorAppointments(@AuthenticationPrincipal UserDetails userDetails,
+                                              @RequestParam(required = false, defaultValue = "appointmentDate") String sortBy,
+                                              @RequestParam(required = false, defaultValue = "asc") String sortDirection,
+                                              @PageableDefault Pageable pageable
+  ) {
+    String username = userDetails.getUsername();
+    Sort.Direction direction = Sort.Direction.fromString(sortDirection);
+    Pageable sortPage = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), Sort.by(direction, sortBy));
+    Page<AppointmentDto> appointments = appointmentService.doctorAppointments(username, sortPage);
     return ResponseEntity.ok(appointments);
   }
 
