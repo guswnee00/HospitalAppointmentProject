@@ -10,6 +10,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.zerobase.hospitalappointmentproject.domain.appointment.entity.AppointmentEntity;
 import org.zerobase.hospitalappointmentproject.domain.appointment.repository.AppointmentRepository;
 import org.zerobase.hospitalappointmentproject.domain.doctor.entity.DoctorEntity;
 import org.zerobase.hospitalappointmentproject.domain.doctor.repository.DoctorRepository;
@@ -50,7 +51,10 @@ public class MedicalRecordService {
     MedicalRecordEntity medicalRecord = medicalRecordRepository.save(MedicalRecordCreate.Request.toEntity(request, patient, doctor));
 
     appointmentRepository.findByPatientAndDoctorAndAppointmentDate(patient, doctor, request.getConsultationDate())
-        .ifPresent(appointmentRepository.save(appointment -> appointment.toBuilder().status(COMPLETE_CONSULTATION).build()));
+        .ifPresent(appointment -> {
+              AppointmentEntity updatedAppointment = appointment.toBuilder().status(COMPLETE_CONSULTATION).build();
+              appointmentRepository.save(updatedAppointment);
+            });
 
     return MedicalRecordDto.toDto(medicalRecord);
 
