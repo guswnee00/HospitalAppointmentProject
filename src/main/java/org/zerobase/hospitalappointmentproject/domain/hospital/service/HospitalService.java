@@ -147,6 +147,23 @@ public class HospitalService {
   }
 
   /**
+   * 진료 과목으로 병원 조회
+   *    1. 각 병원의 소속 의사의 진료 과목을 찾아서
+   *    2. dto list 반환
+   */
+  public List<HospitalDto> searchBySpecialtyName(String specialtyName) {
+
+    specialtyRepository.findByName(specialtyName)
+        .orElseThrow(() -> new CustomException(SPECIALTY_NOT_FOUND));
+
+    return hospitalRepository.findDistinctByDoctors_Specialty_Name(specialtyName)
+        .stream()
+        .map(HospitalDto::toDto)
+        .collect(Collectors.toList());
+
+  }
+
+  /**
    * 병원 이름으로 병원 정보 조회
    *    1. 병원 이름으로 엔티티 가져오기
    *    2. 병원 정보가 없다면 예외 발생
