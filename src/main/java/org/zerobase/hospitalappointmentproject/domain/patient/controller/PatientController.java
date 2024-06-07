@@ -40,7 +40,7 @@ public class PatientController {
   @Parameter(name = "birthMonth", description = "생월")
   @Parameter(name = "birthDay", description = "생일")
   @PostMapping("/signup/patient")
-  public ResponseEntity<?> patientSignup(@RequestBody PatientSignup.Request request) {
+  public ResponseEntity<?> signup(@RequestBody PatientSignup.Request request) {
     PatientDto patientDto = patientService.signup(request);
     PatientSignup.Response response = PatientSignup.Response.fromDto(patientDto);
     return ResponseEntity.ok(response);
