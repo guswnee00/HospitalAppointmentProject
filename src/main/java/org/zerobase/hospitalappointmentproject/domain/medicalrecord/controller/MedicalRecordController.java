@@ -1,5 +1,8 @@
 package org.zerobase.hospitalappointmentproject.domain.medicalrecord.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -24,10 +27,19 @@ import org.zerobase.hospitalappointmentproject.global.common.MedicalRecordSortBy
 
 @RestController
 @RequiredArgsConstructor
+@Tag(name = "Medical Record API", description = "진료 기록 API 입니다.")
 public class MedicalRecordController {
 
   private final MedicalRecordService medicalRecordService;
 
+  @Operation(summary = "medical record create", description = "의사가 진료기록을 생성합니다.")
+  @Parameter(name = "patientName", description = "진료 받은 환자 이름")
+  @Parameter(name = "patientBirthDate", description = "진료 받은 환자 생년월일")
+  @Parameter(name = "doctorName", description = "진료한 의사 이름")
+  @Parameter(name = "consultationDate", description = "진료 날짜")
+  @Parameter(name = "diagnosis", description = "진단명")
+  @Parameter(name = "treatment", description = "치료법")
+  @Parameter(name = "prescription", description = "처방전")
   @PostMapping("/doctor/medical-record")
   public ResponseEntity<?> create(@AuthenticationPrincipal UserDetails userDetails,
                                   @RequestBody MedicalRecordCreate.Request request
@@ -37,8 +49,13 @@ public class MedicalRecordController {
     return ResponseEntity.ok(MedicalRecordCreate.Response.fromDto(medicalRecordDto));
   }
 
+  @Operation(summary = "medical record update", description = "의사가 진료기록을 수정합니다.")
+  @Parameter(name = "diagnosis", description = "진단명")
+  @Parameter(name = "treatment", description = "치료법")
+  @Parameter(name = "prescription", description = "처방전")
   @PatchMapping("/doctor/medical-record/{medicalRecordId}")
   public ResponseEntity<?> update(@AuthenticationPrincipal UserDetails userDetails,
+                                  @Parameter(name = "medicalRecordId", description = "진료기록 번호")
                                   @PathVariable Long medicalRecordId,
                                   @RequestBody MedicalRecordUpdate.Request request
   ) {
@@ -47,6 +64,7 @@ public class MedicalRecordController {
     return ResponseEntity.ok(MedicalRecordUpdate.Response.fromDto(medicalRecordDto));
   }
 
+  @Operation(summary = "list of medical record for doctor", description = "의사가 작성한 진료기록들을 확인합니다.")
   @GetMapping("/doctor/medical-record")
   public ResponseEntity<?> doctorMedicalRecords(@AuthenticationPrincipal UserDetails userDetails,
                                                 @RequestParam(required = false, defaultValue = "consultationDate") String sortBy,
@@ -60,6 +78,7 @@ public class MedicalRecordController {
     return ResponseEntity.ok(medicalRecords);
   }
 
+  @Operation(summary = "list of medical record for patient", description = "환자가 본인의 진료기록들을 확인합니다.")
   @GetMapping("/patient/medical-record")
   public ResponseEntity<?> patientMedicalRecords(@AuthenticationPrincipal UserDetails userDetails,
                                                  @RequestParam(required = false, defaultValue = "CONSULTATION_DATE") String sortBy,

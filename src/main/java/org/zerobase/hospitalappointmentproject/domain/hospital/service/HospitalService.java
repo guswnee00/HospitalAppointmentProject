@@ -14,6 +14,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -123,8 +124,12 @@ public class HospitalService {
   }
 
   /**
-   * 해당 병원에서 진료 가능한 진료과목 리스트
+   * 해당 병원에서 진료 가능한 진료 과목 리스트
+   *    1. 병원 이름으로 병원 검색 한 뒤
+   *    2. 해당 병원의 의사들을 가져와
+   *    3. 의사들의 진료 과목을 list 로 만들어 반환
    */
+  @Cacheable(value = "specialties", key = "#hospitalName")
   public List<String> specialtyList(String hospitalName) {
 
     HospitalEntity hospital = hospitalRepository.findByName(hospitalName)
@@ -143,16 +148,18 @@ public class HospitalService {
 
   /**
    * 진료 과목으로 병원 조회
+   *    1. 각 병원의 소속 의사의 진료 과목을 찾아서
+   *    2. dto list 반환
    */
   public List<HospitalDto> searchBySpecialtyName(String specialtyName) {
 
     specialtyRepository.findByName(specialtyName)
-                       .orElseThrow(() -> new CustomException(SPECIALTY_NOT_FOUND));
+        .orElseThrow(() -> new CustomException(SPECIALTY_NOT_FOUND));
 
     return hospitalRepository.findDistinctByDoctors_Specialty_Name(specialtyName)
-                             .stream()
-                             .map(HospitalDto::toDto)
-                             .collect(Collectors.toList());
+        .stream()
+        .map(HospitalDto::toDto)
+        .collect(Collectors.toList());
 
   }
 
@@ -160,7 +167,7 @@ public class HospitalService {
    * 병원 이름으로 병원 정보 조회
    *    1. 병원 이름으로 엔티티 가져오기
    *    2. 병원 정보가 없다면 예외 발생
-   *    3. 병원 정보 있다면 mapper 를 이용해 dto 반환
+   *    3. 병원 정보 있다면 dto 반환
    */
   @Transactional
   public HospitalDto searchByHospitalName(String hospitalName) {

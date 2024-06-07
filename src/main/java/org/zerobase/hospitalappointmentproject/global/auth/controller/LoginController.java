@@ -1,5 +1,8 @@
 package org.zerobase.hospitalappointmentproject.global.auth.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +19,7 @@ import org.zerobase.hospitalappointmentproject.global.auth.service.LoginService;
 
 @RestController
 @RequiredArgsConstructor
+@Tag(name = "Login API", description = "로그인 API 입니다.")
 public class LoginController {
 
   private final LoginService loginService;
@@ -24,6 +28,9 @@ public class LoginController {
   @Value("${spring.jwt.time}")
   private Long expiredTime;
 
+  @Operation(summary = "patient login", description = "환자가 로그인을 합니다.")
+  @Parameter(name = "username", description = "아이디")
+  @Parameter(name = "password", description = "비밀번호")
   @PostMapping("/login/patient")
   public ResponseEntity<?> patientLogin(@RequestBody LoginDto loginDto) {
 
@@ -35,6 +42,9 @@ public class LoginController {
 
   }
 
+  @Operation(summary = "doctor login", description = "의사가 로그인을 합니다.")
+  @Parameter(name = "username", description = "아이디")
+  @Parameter(name = "password", description = "비밀번호")
   @PostMapping("/login/doctor")
   public ResponseEntity<?> doctorLogin(@RequestBody LoginDto loginDto) {
 
@@ -46,6 +56,9 @@ public class LoginController {
 
   }
 
+  @Operation(summary = "staff login", description = "병원 관계자가 로그인을 합니다.")
+  @Parameter(name = "username", description = "아이디")
+  @Parameter(name = "password", description = "비밀번호")
   @PostMapping("/login/staff")
   public ResponseEntity<?> staffLogin(@RequestBody LoginDto loginDto) {
 
