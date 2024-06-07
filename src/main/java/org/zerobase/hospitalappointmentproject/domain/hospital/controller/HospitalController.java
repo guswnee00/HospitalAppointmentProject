@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.zerobase.hospitalappointmentproject.domain.hospital.dto.HospitalDto;
 import org.zerobase.hospitalappointmentproject.domain.hospital.dto.HospitalInfoResponse;
@@ -103,6 +104,13 @@ public class HospitalController {
   ) {
     HospitalDto hospitalDto = hospitalService.searchByHospitalName(hospitalName);
     return ResponseEntity.ok(HospitalInfoResponse.fromDto(hospitalDto));
+  }
+
+  @Operation(summary = "search nearby hospital", description = "근처 반경 n km의 병원을 검색합니다.")
+  @GetMapping("/search/nearby")
+  public ResponseEntity<?> searchNearBy(@RequestParam double lat, @RequestParam double lon, @RequestParam double radius) {
+    List<HospitalDto> hospitalDtos = hospitalService.searchNearBy(lat, lon, radius);
+    return ResponseEntity.ok(hospitalDtos);
   }
 
 }
