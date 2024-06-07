@@ -12,7 +12,6 @@ import static org.zerobase.hospitalappointmentproject.global.exception.ErrorCode
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -142,7 +141,7 @@ public class HospitalService {
         .filter(Objects::nonNull)
         .map(SpecialtyEntity::getName)
         .distinct()
-        .collect(Collectors.toList());
+        .toList();
 
   }
 
@@ -159,7 +158,7 @@ public class HospitalService {
     return hospitalRepository.findDistinctByDoctors_Specialty_Name(specialtyName)
         .stream()
         .map(HospitalDto::toDto)
-        .collect(Collectors.toList());
+        .toList();
 
   }
 
@@ -177,6 +176,16 @@ public class HospitalService {
 
     return HospitalDto.toDto(hospital);
 
+  }
+
+  /**
+   * 내 위치 근처 병원 조회
+   */
+  public List<HospitalDto> searchNearBy(double lat, double lon, double radius) {
+    return hospitalRepository.findNearByHospital(lat, lon, radius)
+        .stream()
+        .map(HospitalDto::toDto)
+        .toList();
   }
 
 }
