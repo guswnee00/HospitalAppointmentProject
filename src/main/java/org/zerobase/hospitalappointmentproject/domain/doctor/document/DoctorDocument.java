@@ -29,10 +29,10 @@ public class DoctorDocument {
   @Field(type = FieldType.Text)
   private String bio;
 
-  @Field(type = FieldType.Object)
+  @Field(type = FieldType.Nested)
   private SpecialtyDocument specialty;
 
-  @Field(type = FieldType.Object)
+  @Field(type = FieldType.Nested)
   private HospitalDocument hospital;
 
   @Field(type = FieldType.Nested)
