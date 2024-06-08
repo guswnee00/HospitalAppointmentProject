@@ -1,5 +1,7 @@
 package org.zerobase.hospitalappointmentproject.domain.hospital.document;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonFormat.Shape;
 import java.time.LocalTime;
 import java.util.Set;
 import lombok.AllArgsConstructor;
@@ -8,6 +10,7 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.elasticsearch.annotations.DateFormat;
 import org.springframework.data.elasticsearch.annotations.Document;
 import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldType;
@@ -31,7 +34,6 @@ public class HospitalDocument {
   @Field(type = FieldType.Text)
   private String address;
 
-
   @Field(type = FieldType.Double)
   private Double latitude;
 
@@ -44,16 +46,20 @@ public class HospitalDocument {
   @Field(type = FieldType.Text)
   private String description;
 
-  @Field(type = FieldType.Object)
+  @Field(type = FieldType.Date, format = DateFormat.time)
+  @JsonFormat(shape = Shape.STRING, pattern = "HH:mm:ss")
   private LocalTime openTime;
 
-  @Field(type = FieldType.Object)
+  @Field(type = FieldType.Date, format = DateFormat.time)
+  @JsonFormat(shape = Shape.STRING, pattern = "HH:mm:ss")
   private LocalTime closeTime;
 
-  @Field(type = FieldType.Object)
+  @Field(type = FieldType.Date, format = DateFormat.time)
+  @JsonFormat(shape = Shape.STRING, pattern = "HH:mm:ss")
   private LocalTime lunchStartTime;
 
-  @Field(type = FieldType.Object)
+  @Field(type = FieldType.Date, format = DateFormat.time)
+  @JsonFormat(shape = Shape.STRING, pattern = "HH:mm:ss")
   private LocalTime lunchEndTime;
 
   @Field(type = FieldType.Nested)
