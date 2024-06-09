@@ -151,7 +151,30 @@ public class DataSyncService {
 
   private DoctorDocument convertDoctors(DoctorEntity doctor) {
 
-    return DoctorDocument.builder().build();
+    return DoctorDocument.builder()
+        .id(doctor.getId())
+        .username(doctor.getUsername())
+        .password(doctor.getPassword())
+        .role(doctor.getRole())
+        .name(doctor.getName())
+        .phoneNumber(doctor.getPhoneNumber())
+        .email(doctor.getEmail())
+        .bio(doctor.getBio())
+        .specialtyId(doctor.getSpecialty().getId())
+        .hospitalId(doctor.getHospital().getId())
+        .medicalRecords(Optional.ofNullable(doctor.getMedicalRecords())
+                                .orElse(Collections.emptySet())
+                                .stream()
+                                .map(MedicalRecordEntity::getId)
+                                .collect(Collectors.toSet()))
+        .appointments(Optional.ofNullable(doctor.getAppointments())
+                              .orElse(Collections.emptySet())
+                              .stream()
+                              .map(AppointmentEntity::getId)
+                              .collect(Collectors.toSet()))
+        .createdAt(doctor.getCreatedAt())
+        .modifiedAt(doctor.getModifiedAt())
+        .build();
 
   }
 
