@@ -62,14 +62,22 @@ public class DataSyncService {
   }
 
   public void syncPatients() {
+
     List<PatientEntity> patientEntities = patientRepository.findAll();
     List<PatientDocument> patientDocuments = patientEntities.stream()
                                                             .map(this::convertPatients)
-                                                            .collect(Collectors.toList());
+                                                            .toList();
     patientElasticRepository.saveAll(patientDocuments);
+
   }
 
   public void syncStaffs() {
+
+    List<StaffEntity> staffEntities = staffRepository.findAll();
+    List<StaffDocument> staffDocuments = staffEntities.stream()
+                                                      .map(this::convertStaffs)
+                                                      .toList();
+    staffElasticRepository.saveAll(staffDocuments);
 
   }
 
@@ -124,7 +132,20 @@ public class DataSyncService {
 
   private StaffDocument convertStaffs(StaffEntity staff) {
 
-    return StaffDocument.builder().build();
+    return StaffDocument.builder()
+        .id(staff.getId())
+        .username(staff.getUsername())
+        .password(staff.getPassword())
+        .role(staff.getRole())
+        .name(staff.getName())
+        .phoneNumber(staff.getPhoneNumber())
+        .email(staff.getEmail())
+        .hospitalId(Optional.ofNullable(staff.getHospital())
+                            .map(HospitalEntity::getId)
+                            .orElse(null))
+        .createdAt(staff.getCreatedAt())
+        .modifiedAt(staff.getModifiedAt())
+        .build();
 
   }
 
