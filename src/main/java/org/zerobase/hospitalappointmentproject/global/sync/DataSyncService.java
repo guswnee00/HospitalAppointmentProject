@@ -103,6 +103,12 @@ public class DataSyncService {
 
   public void syncAppointments() {
 
+    List<AppointmentEntity> appointmentEntities = appointmentRepository.findAll();
+    List<AppointmentDocument> appointmentDocuments = appointmentEntities.stream()
+                                                                        .map(this::convertAppointments)
+                                                                        .toList();
+    appointmentElasticRepository.saveAll(appointmentDocuments);
+
   }
 
   public void syncHospitals() {
@@ -201,7 +207,17 @@ public class DataSyncService {
 
   private AppointmentDocument convertAppointments(AppointmentEntity appointment) {
 
-    return AppointmentDocument.builder().build();
+    return AppointmentDocument.builder()
+        .id(appointment.getId())
+        .appointmentDate(appointment.getAppointmentDate())
+        .appointmentTime(appointment.getAppointmentTime())
+        .status(appointment.getStatus())
+        .createdAt(appointment.getCreatedAt())
+        .modifiedAt(appointment.getModifiedAt())
+        .patientId(appointment.getPatient().getId())
+        .doctorId(appointment.getDoctor().getId())
+        .hospitalId(appointment.getHospital().getId())
+        .build();
 
   }
 
