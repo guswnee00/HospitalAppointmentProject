@@ -2,6 +2,7 @@ package org.zerobase.hospitalappointmentproject.domain.patient.document;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Set;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -13,8 +14,6 @@ import org.springframework.data.elasticsearch.annotations.DateFormat;
 import org.springframework.data.elasticsearch.annotations.Document;
 import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldType;
-import org.zerobase.hospitalappointmentproject.domain.appointment.document.AppointmentDocument;
-import org.zerobase.hospitalappointmentproject.domain.medicalrecord.document.MedicalRecordDocument;
 import org.zerobase.hospitalappointmentproject.global.common.GenderType;
 
 @SuperBuilder(toBuilder = true)
@@ -56,10 +55,18 @@ public class PatientDocument {
   @Field(type = FieldType.Text)
   private String address;
 
-  @Field(type = FieldType.Nested)
-  private Set<MedicalRecordDocument> medicalRecords;
+  @Field(type = FieldType.Keyword)
+  private Set<Long> medicalRecords;
 
-  @Field(type = FieldType.Nested)
-  private Set<AppointmentDocument> appointments;
+  @Field(type = FieldType.Keyword)
+  private Set<Long> appointments;
+
+  @Field(type = FieldType.Date, format = DateFormat.date_time)
+  @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
+  private LocalDateTime createdAt;
+
+  @Field(type = FieldType.Date, format = DateFormat.date_time)
+  @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
+  private LocalDateTime modifiedAt;
 
 }
