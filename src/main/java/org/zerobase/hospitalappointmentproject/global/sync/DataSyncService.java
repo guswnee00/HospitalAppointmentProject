@@ -60,6 +60,14 @@ public class DataSyncService {
   @Transactional(readOnly = true)
   public void syncAll() {
 
+    syncPatients();
+    syncStaffs();
+    syncDoctors();
+    syncSpecialties();
+    syncAppointments();
+    syncHospitals();
+    syncMedicalRecords();
+
   }
 
   public void syncPatients() {
