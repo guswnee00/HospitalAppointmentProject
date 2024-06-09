@@ -15,8 +15,6 @@ import org.springframework.data.elasticsearch.annotations.DateFormat;
 import org.springframework.data.elasticsearch.annotations.Document;
 import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldType;
-import org.zerobase.hospitalappointmentproject.domain.doctor.document.DoctorDocument;
-import org.zerobase.hospitalappointmentproject.domain.hospital.document.HospitalDocument;
 import org.zerobase.hospitalappointmentproject.global.common.AppointmentStatus;
 
 @SuperBuilder(toBuilder = true)
@@ -49,10 +47,10 @@ public class AppointmentDocument {
   @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
   private LocalDateTime modifiedAt;
 
-  @Field(type = FieldType.Nested)
-  private DoctorDocument doctor;
+  @Field(type = FieldType.Long)
+  private Long doctorId;
 
   @Field(type = FieldType.Nested)
-  private HospitalDocument hospital;
+  private Long hospitalId;
 
 }

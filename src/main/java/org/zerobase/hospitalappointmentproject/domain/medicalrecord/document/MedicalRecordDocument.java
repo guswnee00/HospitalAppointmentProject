@@ -11,8 +11,6 @@ import org.springframework.data.elasticsearch.annotations.DateFormat;
 import org.springframework.data.elasticsearch.annotations.Document;
 import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldType;
-import org.zerobase.hospitalappointmentproject.domain.doctor.document.DoctorDocument;
-import org.zerobase.hospitalappointmentproject.domain.patient.document.PatientDocument;
 
 @Builder(toBuilder = true)
 @Getter
@@ -37,10 +35,10 @@ public class MedicalRecordDocument {
   @Field(type = FieldType.Text)
   private String prescription;
 
-  @Field(type = FieldType.Nested)
-  private PatientDocument patient;
+  @Field(type = FieldType.Long)
+  private Long patientId;
 
-  @Field(type = FieldType.Nested)
-  private DoctorDocument doctor;
+  @Field(type = FieldType.Long)
+  private Long doctorId;
 
 }

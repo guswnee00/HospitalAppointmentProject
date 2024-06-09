@@ -12,7 +12,6 @@ import org.springframework.data.elasticsearch.annotations.DateFormat;
 import org.springframework.data.elasticsearch.annotations.Document;
 import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldType;
-import org.zerobase.hospitalappointmentproject.domain.hospital.entity.HospitalEntity;
 
 @SuperBuilder(toBuilder = true)
 @Getter
@@ -43,8 +42,8 @@ public class StaffDocument {
   @Field(type = FieldType.Text)
   private String email;
 
-  @Field(type = FieldType.Nested)
-  private HospitalEntity hospital;
+  @Field(type = FieldType.Long)
+  private Long hospitalId;
 
   @Field(type = FieldType.Date, format = DateFormat.date_time)
   @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
