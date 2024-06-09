@@ -124,6 +124,12 @@ public class DataSyncService {
 
   public void syncMedicalRecords() {
 
+    List<MedicalRecordEntity> medicalRecordEntities = medicalRecordRepository.findAll();
+    List<MedicalRecordDocument> medicalRecordDocuments = medicalRecordEntities.stream()
+                                                                              .map(this::convertMedicalRecords)
+                                                                              .toList();
+    medicalRecordElasticRepository.saveAll(medicalRecordDocuments);
+
   }
 
   private PatientDocument convertPatients(PatientEntity patient) {
@@ -257,7 +263,15 @@ public class DataSyncService {
 
   private MedicalRecordDocument convertMedicalRecords(MedicalRecordEntity medicalRecord) {
 
-    return MedicalRecordDocument.builder().build();
+    return MedicalRecordDocument.builder()
+        .id(medicalRecord.getId())
+        .consultationDate(medicalRecord.getConsultationDate())
+        .diagnosis(medicalRecord.getDiagnosis())
+        .treatment(medicalRecord.getTreatment())
+        .prescription(medicalRecord.getPrescription())
+        .patientId(medicalRecord.getPatient().getId())
+        .doctorId(medicalRecord.getDoctor().getId())
+        .build();
 
   }
 
