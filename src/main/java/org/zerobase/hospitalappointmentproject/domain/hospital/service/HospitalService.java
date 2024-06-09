@@ -18,16 +18,19 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.zerobase.hospitalappointmentproject.domain.doctor.entity.DoctorEntity;
+import org.zerobase.hospitalappointmentproject.domain.hospital.document.HospitalDocument;
 import org.zerobase.hospitalappointmentproject.domain.hospital.dto.HospitalDto;
 import org.zerobase.hospitalappointmentproject.domain.hospital.dto.HospitalInfoUpdate;
 import org.zerobase.hospitalappointmentproject.domain.hospital.dto.HospitalRegister;
 import org.zerobase.hospitalappointmentproject.domain.hospital.entity.HospitalEntity;
+import org.zerobase.hospitalappointmentproject.domain.hospital.repository.HospitalElasticRepository;
 import org.zerobase.hospitalappointmentproject.domain.hospital.repository.HospitalRepository;
 import org.zerobase.hospitalappointmentproject.domain.specialty.entity.SpecialtyEntity;
 import org.zerobase.hospitalappointmentproject.domain.specialty.repository.SpecialtyRepository;
 import org.zerobase.hospitalappointmentproject.domain.staff.entity.StaffEntity;
 import org.zerobase.hospitalappointmentproject.domain.staff.repository.StaffRepository;
 import org.zerobase.hospitalappointmentproject.global.exception.CustomException;
+import org.zerobase.hospitalappointmentproject.global.sync.DataSyncService;
 
 @Service
 @RequiredArgsConstructor
@@ -37,6 +40,8 @@ public class HospitalService {
   private final StaffRepository staffRepository;
   private final BCryptPasswordEncoder bCryptPasswordEncoder;
   private final SpecialtyRepository specialtyRepository;
+  private final HospitalElasticRepository hospitalElasticRepository;
+  private final DataSyncService dataSyncService;
 
   /**
    * 병원 관계자의 병원 등록
@@ -186,6 +191,12 @@ public class HospitalService {
         .stream()
         .map(HospitalDto::toDto)
         .toList();
+  }
+
+  @Transactional
+  public List<HospitalDocument> searchByHospitalNameES(String hospitalName) {
+    dataSyncService.syncAll();
+    return hospitalElasticRepository.findByNameContaining(hospitalName);
   }
 
 }

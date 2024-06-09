@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.zerobase.hospitalappointmentproject.domain.hospital.document.HospitalDocument;
 import org.zerobase.hospitalappointmentproject.domain.hospital.dto.HospitalDto;
 import org.zerobase.hospitalappointmentproject.domain.hospital.dto.HospitalInfoResponse;
 import org.zerobase.hospitalappointmentproject.domain.hospital.dto.HospitalInfoUpdate;
@@ -113,4 +114,9 @@ public class HospitalController {
     return ResponseEntity.ok(hospitalDtos);
   }
 
+  @GetMapping("/search/hospital")
+  public ResponseEntity<?> searchByHospitalNameES(@RequestParam String hospitalName) {
+    List<HospitalDocument> hospitalDocuments = hospitalService.searchByHospitalNameES(hospitalName);
+    return ResponseEntity.ok(hospitalDocuments);
+  }
 }
