@@ -48,6 +48,9 @@ public class AppointmentDocument {
   private LocalDateTime modifiedAt;
 
   @Field(type = FieldType.Long)
+  private Long patientId;
+
+  @Field(type = FieldType.Long)
   private Long doctorId;
 
   @Field(type = FieldType.Nested)
