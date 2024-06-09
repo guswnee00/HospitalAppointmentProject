@@ -83,9 +83,21 @@ public class DataSyncService {
 
   public void syncDoctors() {
 
+    List<DoctorEntity> doctorEntities = doctorRepository.findAll();
+    List<DoctorDocument> doctorDocuments = doctorEntities.stream()
+                                                         .map(this::convertDoctors)
+                                                         .toList();
+    doctorElasticRepository.saveAll(doctorDocuments);
+
   }
 
   public void syncSpecialties() {
+
+    List<SpecialtyEntity> specialtyEntities = specialtyRepository.findAll();
+    List<SpecialtyDocument> specialtyDocuments = specialtyEntities.stream()
+                                                                  .map(this::convertSpecialties)
+                                                                  .toList();
+    specialtyElasticRepository.saveAll(specialtyDocuments);
 
   }
 
@@ -180,7 +192,10 @@ public class DataSyncService {
 
   private SpecialtyDocument convertSpecialties(SpecialtyEntity specialty) {
 
-    return SpecialtyDocument.builder().build();
+    return SpecialtyDocument.builder()
+        .id(specialty.getId())
+        .name(specialty.getName())
+        .build();
 
   }
 
