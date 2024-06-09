@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.elasticsearch.core.geo.GeoPoint;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.zerobase.hospitalappointmentproject.domain.appointment.document.AppointmentDocument;
@@ -112,6 +113,12 @@ public class DataSyncService {
   }
 
   public void syncHospitals() {
+
+    List<HospitalEntity> hospitalEntities = hospitalRepository.findAll();
+    List<HospitalDocument> hospitalDocuments = hospitalEntities.stream()
+                                                               .map(this::convertHospitals)
+                                                               .toList();
+    hospitalElasticRepository.saveAll(hospitalDocuments);
 
   }
 
@@ -223,7 +230,28 @@ public class DataSyncService {
 
   private HospitalDocument convertHospitals(HospitalEntity hospital) {
 
-    return HospitalDocument.builder().build();
+    return HospitalDocument.builder()
+        .id(hospital.getId())
+        .name(hospital.getName())
+        .address(hospital.getAddress())
+        .location(new GeoPoint(hospital.getLatitude(), hospital.getLongitude()))
+        .contactNumber(hospital.getContactNumber())
+        .description(hospital.getDescription())
+        .openTime(hospital.getOpenTime())
+        .closeTime(hospital.getCloseTime())
+        .lunchStartTime(hospital.getLunchStartTime())
+        .lunchEndTime(hospital.getLunchEndTime())
+        .doctors(Optional.ofNullable(hospital.getDoctors())
+                         .orElse(Collections.emptySet())
+                         .stream()
+                         .map(DoctorEntity::getId)
+                         .collect(Collectors.toSet()))
+        .appointments(Optional.ofNullable(hospital.getAppointments())
+                              .orElse(Collections.emptySet())
+                              .stream()
+                              .map(AppointmentEntity::getId)
+                              .collect(Collectors.toSet()))
+        .build();
 
   }
 
