@@ -14,6 +14,9 @@ import java.util.Objects;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.elasticsearch.core.geo.GeoPoint;
+import org.springframework.data.geo.Distance;
+import org.springframework.data.geo.Metrics;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,7 +33,6 @@ import org.zerobase.hospitalappointmentproject.domain.specialty.repository.Speci
 import org.zerobase.hospitalappointmentproject.domain.staff.entity.StaffEntity;
 import org.zerobase.hospitalappointmentproject.domain.staff.repository.StaffRepository;
 import org.zerobase.hospitalappointmentproject.global.exception.CustomException;
-import org.zerobase.hospitalappointmentproject.global.sync.DataSyncService;
 
 @Service
 @RequiredArgsConstructor
@@ -41,7 +43,6 @@ public class HospitalService {
   private final BCryptPasswordEncoder bCryptPasswordEncoder;
   private final SpecialtyRepository specialtyRepository;
   private final HospitalElasticRepository hospitalElasticRepository;
-  private final DataSyncService dataSyncService;
 
   /**
    * 병원 관계자의 병원 등록
@@ -187,16 +188,32 @@ public class HospitalService {
    * 내 위치 근처 병원 조회
    */
   public List<HospitalDto> searchNearBy(double lat, double lon, double radius) {
+
     return hospitalRepository.findNearByHospital(lat, lon, radius)
         .stream()
         .map(HospitalDto::toDto)
         .toList();
+
   }
 
-  @Transactional
   public List<HospitalDocument> searchByHospitalNameES(String hospitalName) {
-    dataSyncService.syncAll();
+
     return hospitalElasticRepository.findByNameContaining(hospitalName);
+
   }
 
+  public List<HospitalDocument> searchNearByES(double lat, double lon, double radius) {
+
+    GeoPoint location = new GeoPoint(lat, lon);
+    Distance distance = new Distance(radius, Metrics.KILOMETERS);
+
+    return hospitalElasticRepository.findByLocationNear(location, distance);
+
+  }
+
+  public List<HospitalDocument> searchBySpecialtyNameES(String specialtyName) {
+
+    return hospitalElasticRepository.findBySpecialtiesContaining(specialtyName);
+
+  }
 }

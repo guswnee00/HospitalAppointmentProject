@@ -114,9 +114,22 @@ public class HospitalController {
     return ResponseEntity.ok(hospitalDtos);
   }
 
-  @GetMapping("/search/hospital")
+  @GetMapping("/search/hospital-name")
   public ResponseEntity<?> searchByHospitalNameES(@RequestParam String hospitalName) {
-    List<HospitalDocument> hospitalDocuments = hospitalService.searchByHospitalNameES(hospitalName);
+    List<HospitalDocument> hospitalDocuments =  hospitalService.searchByHospitalNameES(hospitalName);
     return ResponseEntity.ok(hospitalDocuments);
   }
+
+  @GetMapping("/search/location")
+  public ResponseEntity<?> searchNearByES(@RequestParam double lat, @RequestParam double lon, @RequestParam double radius) {
+    List<HospitalDocument> hospitalDocuments =  hospitalService.searchNearByES(lat, lon, radius);
+    return ResponseEntity.ok(hospitalDocuments);
+  }
+
+  @GetMapping("/search/specialty-name")
+  public ResponseEntity<?> searchBySpecialtyNameES(@RequestParam String specialtyName) {
+    List<HospitalDocument> hospitalDocuments =  hospitalService.searchBySpecialtyNameES(specialtyName);
+    return ResponseEntity.ok(hospitalDocuments);
+  }
+
 }
