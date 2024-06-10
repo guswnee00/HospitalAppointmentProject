@@ -1,8 +1,5 @@
 package org.zerobase.hospitalappointmentproject.domain.hospital.document;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonFormat.Shape;
-import java.time.LocalTime;
 import java.util.Set;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -10,7 +7,6 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.elasticsearch.annotations.DateFormat;
 import org.springframework.data.elasticsearch.annotations.Document;
 import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldType;
@@ -49,26 +45,27 @@ public class HospitalDocument {
   @Field(type = FieldType.Text)
   private String description;
 
-  @Field(type = FieldType.Date, format = DateFormat.time)
-  @JsonFormat(shape = Shape.STRING, pattern = "HH:mm:ss")
-  private LocalTime openTime;
+  //@Field(type = FieldType.Date, format = DateFormat.hour_minute_second)
+  //@JsonFormat(shape = Shape.STRING, pattern = "HH:mm:ss")
+  @Field(type = FieldType.Text)
+  private String openTime;
 
-  @Field(type = FieldType.Date, format = DateFormat.time)
-  @JsonFormat(shape = Shape.STRING, pattern = "HH:mm:ss")
-  private LocalTime closeTime;
+  //@Field(type = FieldType.Date, format = DateFormat.hour_minute_second)
+  //@JsonFormat(shape = Shape.STRING, pattern = "HH:mm:ss")
+  @Field(type = FieldType.Text)
+  private String closeTime;
 
-  @Field(type = FieldType.Date, format = DateFormat.time)
-  @JsonFormat(shape = Shape.STRING, pattern = "HH:mm:ss")
-  private LocalTime lunchStartTime;
+  //@Field(type = FieldType.Date, format = DateFormat.hour_minute_second)
+  //@JsonFormat(shape = Shape.STRING, pattern = "HH:mm:ss")
+  @Field(type = FieldType.Text)
+  private String lunchStartTime;
 
-  @Field(type = FieldType.Date, format = DateFormat.time)
-  @JsonFormat(shape = Shape.STRING, pattern = "HH:mm:ss")
-  private LocalTime lunchEndTime;
+  //@Field(type = FieldType.Date, format = DateFormat.hour_minute_second)
+  //@JsonFormat(shape = Shape.STRING, pattern = "HH:mm:ss")
+  @Field(type = FieldType.Text)
+  private String lunchEndTime;
 
-  @Field(type = FieldType.Keyword)
-  private Set<Long> doctors;
-
-  @Field(type = FieldType.Keyword)
-  private Set<Long> appointments;
+  @Field(type = FieldType.Text)
+  private Set<String> specialties;
 
 }
