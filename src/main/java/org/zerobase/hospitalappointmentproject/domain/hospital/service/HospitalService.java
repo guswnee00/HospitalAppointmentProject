@@ -5,27 +5,29 @@ import static org.zerobase.hospitalappointmentproject.global.exception.ErrorCode
 import static org.zerobase.hospitalappointmentproject.global.exception.ErrorCode.HOSPITAL_NOT_FOUND;
 import static org.zerobase.hospitalappointmentproject.global.exception.ErrorCode.PASSWORD_DOES_NOT_MATCH;
 import static org.zerobase.hospitalappointmentproject.global.exception.ErrorCode.PASSWORD_IS_REQUIRED_TO_UPDATE_INFO;
-import static org.zerobase.hospitalappointmentproject.global.exception.ErrorCode.SPECIALTY_NOT_FOUND;
 import static org.zerobase.hospitalappointmentproject.global.exception.ErrorCode.STAFF_NOT_FOUND;
 import static org.zerobase.hospitalappointmentproject.global.exception.ErrorCode.THIS_HOSPITAL_NAME_ALREADY_EXISTS;
 
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.elasticsearch.core.geo.GeoPoint;
+import org.springframework.data.geo.Distance;
+import org.springframework.data.geo.Metrics;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.zerobase.hospitalappointmentproject.domain.doctor.entity.DoctorEntity;
+import org.zerobase.hospitalappointmentproject.domain.hospital.document.HospitalDocument;
 import org.zerobase.hospitalappointmentproject.domain.hospital.dto.HospitalDto;
 import org.zerobase.hospitalappointmentproject.domain.hospital.dto.HospitalInfoUpdate;
 import org.zerobase.hospitalappointmentproject.domain.hospital.dto.HospitalRegister;
 import org.zerobase.hospitalappointmentproject.domain.hospital.entity.HospitalEntity;
+import org.zerobase.hospitalappointmentproject.domain.hospital.repository.HospitalElasticRepository;
 import org.zerobase.hospitalappointmentproject.domain.hospital.repository.HospitalRepository;
 import org.zerobase.hospitalappointmentproject.domain.specialty.entity.SpecialtyEntity;
-import org.zerobase.hospitalappointmentproject.domain.specialty.repository.SpecialtyRepository;
 import org.zerobase.hospitalappointmentproject.domain.staff.entity.StaffEntity;
 import org.zerobase.hospitalappointmentproject.domain.staff.repository.StaffRepository;
 import org.zerobase.hospitalappointmentproject.global.exception.CustomException;
@@ -37,7 +39,7 @@ public class HospitalService {
   private final HospitalRepository hospitalRepository;
   private final StaffRepository staffRepository;
   private final BCryptPasswordEncoder bCryptPasswordEncoder;
-  private final SpecialtyRepository specialtyRepository;
+  private final HospitalElasticRepository hospitalElasticRepository;
 
   /**
    * 병원 관계자의 병원 등록
@@ -142,40 +144,37 @@ public class HospitalService {
         .filter(Objects::nonNull)
         .map(SpecialtyEntity::getName)
         .distinct()
-        .collect(Collectors.toList());
+        .toList();
+
+  }
+
+  /**
+   * 병원 이름으로 병원 조회
+   */
+  public List<HospitalDocument> searchByHospitalName(String hospitalName) {
+
+    return hospitalElasticRepository.findByNameContaining(hospitalName);
+
+  }
+
+  /**
+   * 내 위치 근처 병원 조회
+   */
+  public List<HospitalDocument> searchNearBy(double lat, double lon, double radius) {
+
+    GeoPoint location = new GeoPoint(lat, lon);
+    Distance distance = new Distance(radius, Metrics.KILOMETERS);
+
+    return hospitalElasticRepository.findByLocationNear(location, distance);
 
   }
 
   /**
    * 진료 과목으로 병원 조회
-   *    1. 각 병원의 소속 의사의 진료 과목을 찾아서
-   *    2. dto list 반환
    */
-  public List<HospitalDto> searchBySpecialtyName(String specialtyName) {
+  public List<HospitalDocument> searchBySpecialtyName(String specialtyName) {
 
-    specialtyRepository.findByName(specialtyName)
-        .orElseThrow(() -> new CustomException(SPECIALTY_NOT_FOUND));
-
-    return hospitalRepository.findDistinctByDoctors_Specialty_Name(specialtyName)
-        .stream()
-        .map(HospitalDto::toDto)
-        .collect(Collectors.toList());
-
-  }
-
-  /**
-   * 병원 이름으로 병원 정보 조회
-   *    1. 병원 이름으로 엔티티 가져오기
-   *    2. 병원 정보가 없다면 예외 발생
-   *    3. 병원 정보 있다면 dto 반환
-   */
-  @Transactional
-  public HospitalDto searchByHospitalName(String hospitalName) {
-
-    HospitalEntity hospital = hospitalRepository.findByName(hospitalName)
-                                                .orElseThrow(() -> new CustomException(HOSPITAL_NOT_FOUND));
-
-    return HospitalDto.toDto(hospital);
+    return hospitalElasticRepository.findBySpecialtiesContaining(specialtyName);
 
   }
 

@@ -14,9 +14,10 @@ import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.zerobase.hospitalappointmentproject.domain.hospital.document.HospitalDocument;
 import org.zerobase.hospitalappointmentproject.domain.hospital.dto.HospitalDto;
-import org.zerobase.hospitalappointmentproject.domain.hospital.dto.HospitalInfoResponse;
 import org.zerobase.hospitalappointmentproject.domain.hospital.dto.HospitalInfoUpdate;
 import org.zerobase.hospitalappointmentproject.domain.hospital.dto.HospitalRegister;
 import org.zerobase.hospitalappointmentproject.domain.hospital.service.HospitalService;
@@ -86,23 +87,32 @@ public class HospitalController {
     return ResponseEntity.ok(specialties);
   }
 
-  @Operation(summary = "list of hospital with specialty", description = "진료 과목으로 병원을 검색합니다.")
-  @GetMapping("/search/{specialtyName}")
-  public ResponseEntity<?> searchBySpecialtyName(@Parameter(name = "specialtyName", description = "진료 과목 이름")
-                                                 @PathVariable String specialtyName
+  @Operation(summary = "search hospital with hospital name", description = "병원 이름으로 병원을 검색합니다.")
+  @GetMapping("/search/hospital-name")
+  public ResponseEntity<?> searchByHospitalName(@Parameter(name = "hospitalName", description = "병원 이름")
+                                                @RequestParam String hospitalName
   ) {
-    List<HospitalDto> hospitalDtos = hospitalService.searchBySpecialtyName(specialtyName);
-    List<HospitalInfoResponse> hospitalInfoResponses = hospitalDtos.stream().map(HospitalInfoResponse::fromDto).toList();
-    return ResponseEntity.ok(hospitalInfoResponses);
+    List<HospitalDocument> hospitalDocuments =  hospitalService.searchByHospitalName(hospitalName);
+    return ResponseEntity.ok(hospitalDocuments);
   }
 
-  @Operation(summary = "list of hospital with name", description = "병원 이름으로 병원을 검색합니다.")
-  @GetMapping("/search/{hospitalName}")
-  public ResponseEntity<?> searchByHospitalName(@Parameter(name = "hospitalName", description = "병원 이름")
-                                                @PathVariable String hospitalName
+  @Operation(summary = "search nearby hospital", description = "근처 반경 n km의 병원을 검색합니다.")
+  @GetMapping("/search/location")
+  public ResponseEntity<?> searchNearBy(@Parameter(name = "lat", description = "현재 위도") @RequestParam double lat,
+                                        @Parameter(name = "lon", description = "현재 경도") @RequestParam double lon,
+                                        @Parameter(name = "radius", description = "검색 반경(km)") @RequestParam double radius
   ) {
-    HospitalDto hospitalDto = hospitalService.searchByHospitalName(hospitalName);
-    return ResponseEntity.ok(HospitalInfoResponse.fromDto(hospitalDto));
+    List<HospitalDocument> hospitalDocuments =  hospitalService.searchNearBy(lat, lon, radius);
+    return ResponseEntity.ok(hospitalDocuments);
+  }
+
+  @Operation(summary = "search hospital with specialty", description = "진료 과목으로 병원을 검색합니다.")
+  @GetMapping("/search/specialty-name")
+  public ResponseEntity<?> searchBySpecialtyName(@Parameter(name = "specialtyName", description = "진료 과목 이름")
+                                                 @RequestParam String specialtyName
+  ) {
+    List<HospitalDocument> hospitalDocuments =  hospitalService.searchBySpecialtyName(specialtyName);
+    return ResponseEntity.ok(hospitalDocuments);
   }
 
 }

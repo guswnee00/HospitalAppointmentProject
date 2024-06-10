@@ -181,25 +181,4 @@ class HospitalServiceTest {
 
   }
 
-  @Test
-  void successGetInfo() {
-
-    HospitalEntity hospital = HospitalEntity.builder().name("hospital1").build();
-    when(hospitalRepository.findByName("hospital1")).thenReturn(Optional.of(hospital));
-
-    HospitalDto hospitalDto = hospitalService.searchByHospitalName("hospital1");
-
-    assertNotNull(hospitalDto);
-
-  }
-
-  @Test
-  void failGetInfo_HospitalNotFound() {
-
-    when(hospitalRepository.findByName("hospital1")).thenReturn(Optional.empty());
-
-    assertThrows(CustomException.class, () -> hospitalService.searchByHospitalName("hospital1"));
-
-  }
-
 }
