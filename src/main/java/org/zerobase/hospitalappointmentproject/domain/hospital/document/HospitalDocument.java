@@ -1,5 +1,6 @@
 package org.zerobase.hospitalappointmentproject.domain.hospital.document;
 
+import java.time.LocalTime;
 import java.util.Set;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -7,6 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.elasticsearch.annotations.DateFormat;
 import org.springframework.data.elasticsearch.annotations.Document;
 import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldType;
@@ -45,25 +47,17 @@ public class HospitalDocument {
   @Field(type = FieldType.Text)
   private String description;
 
-  //@Field(type = FieldType.Date, format = DateFormat.hour_minute_second)
-  //@JsonFormat(shape = Shape.STRING, pattern = "HH:mm:ss")
-  @Field(type = FieldType.Text)
-  private String openTime;
+  @Field(type = FieldType.Date, format = DateFormat.hour_minute_second)
+  private LocalTime openTime;
 
-  //@Field(type = FieldType.Date, format = DateFormat.hour_minute_second)
-  //@JsonFormat(shape = Shape.STRING, pattern = "HH:mm:ss")
-  @Field(type = FieldType.Text)
-  private String closeTime;
+  @Field(type = FieldType.Date, format = DateFormat.hour_minute_second)
+  private LocalTime closeTime;
 
-  //@Field(type = FieldType.Date, format = DateFormat.hour_minute_second)
-  //@JsonFormat(shape = Shape.STRING, pattern = "HH:mm:ss")
-  @Field(type = FieldType.Text)
-  private String lunchStartTime;
+  @Field(type = FieldType.Date, format = DateFormat.hour_minute_second)
+  private LocalTime lunchStartTime;
 
-  //@Field(type = FieldType.Date, format = DateFormat.hour_minute_second)
-  //@JsonFormat(shape = Shape.STRING, pattern = "HH:mm:ss")
-  @Field(type = FieldType.Text)
-  private String lunchEndTime;
+  @Field(type = FieldType.Date, format = DateFormat.hour_minute_second)
+  private LocalTime lunchEndTime;
 
   @Field(type = FieldType.Text)
   private Set<String> specialties;

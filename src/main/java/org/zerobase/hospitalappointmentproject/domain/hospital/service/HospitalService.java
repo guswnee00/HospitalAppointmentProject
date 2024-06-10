@@ -216,4 +216,5 @@ public class HospitalService {
     return hospitalElasticRepository.findBySpecialtiesContaining(specialtyName);
 
   }
+
 }
