@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.zerobase.hospitalappointmentproject.domain.hospital.document.HospitalDocument;
 import org.zerobase.hospitalappointmentproject.domain.hospital.dto.HospitalDto;
-import org.zerobase.hospitalappointmentproject.domain.hospital.dto.HospitalInfoResponse;
 import org.zerobase.hospitalappointmentproject.domain.hospital.dto.HospitalInfoUpdate;
 import org.zerobase.hospitalappointmentproject.domain.hospital.dto.HospitalRegister;
 import org.zerobase.hospitalappointmentproject.domain.hospital.service.HospitalService;
@@ -88,47 +87,31 @@ public class HospitalController {
     return ResponseEntity.ok(specialties);
   }
 
-  @Operation(summary = "list of hospital with specialty", description = "진료 과목으로 병원을 검색합니다.")
-  @GetMapping("/search/{specialtyName}")
-  public ResponseEntity<?> searchBySpecialtyName(@Parameter(name = "specialtyName", description = "진료 과목 이름")
-                                                 @PathVariable String specialtyName
-  ) {
-    List<HospitalDto> hospitalDtos = hospitalService.searchBySpecialtyName(specialtyName);
-    List<HospitalInfoResponse> hospitalInfoResponses = hospitalDtos.stream().map(HospitalInfoResponse::fromDto).toList();
-    return ResponseEntity.ok(hospitalInfoResponses);
-  }
-
-  @Operation(summary = "list of hospital with name", description = "병원 이름으로 병원을 검색합니다.")
-  @GetMapping("/search/{hospitalName}")
+  @Operation(summary = "search hospital with hospital name", description = "병원 이름으로 병원을 검색합니다.")
+  @GetMapping("/search/hospital-name")
   public ResponseEntity<?> searchByHospitalName(@Parameter(name = "hospitalName", description = "병원 이름")
-                                                @PathVariable String hospitalName
+                                                @RequestParam String hospitalName
   ) {
-    HospitalDto hospitalDto = hospitalService.searchByHospitalName(hospitalName);
-    return ResponseEntity.ok(HospitalInfoResponse.fromDto(hospitalDto));
+    List<HospitalDocument> hospitalDocuments =  hospitalService.searchByHospitalName(hospitalName);
+    return ResponseEntity.ok(hospitalDocuments);
   }
 
   @Operation(summary = "search nearby hospital", description = "근처 반경 n km의 병원을 검색합니다.")
-  @GetMapping("/search/nearby")
-  public ResponseEntity<?> searchNearBy(@RequestParam double lat, @RequestParam double lon, @RequestParam double radius) {
-    List<HospitalDto> hospitalDtos = hospitalService.searchNearBy(lat, lon, radius);
-    return ResponseEntity.ok(hospitalDtos);
-  }
-
-  @GetMapping("/search/hospital-name")
-  public ResponseEntity<?> searchByHospitalNameES(@RequestParam String hospitalName) {
-    List<HospitalDocument> hospitalDocuments =  hospitalService.searchByHospitalNameES(hospitalName);
-    return ResponseEntity.ok(hospitalDocuments);
-  }
-
   @GetMapping("/search/location")
-  public ResponseEntity<?> searchNearByES(@RequestParam double lat, @RequestParam double lon, @RequestParam double radius) {
-    List<HospitalDocument> hospitalDocuments =  hospitalService.searchNearByES(lat, lon, radius);
+  public ResponseEntity<?> searchNearBy(@Parameter(name = "lat", description = "현재 위도") @RequestParam double lat,
+                                        @Parameter(name = "lon", description = "현재 경도") @RequestParam double lon,
+                                        @Parameter(name = "radius", description = "검색 반경(km)") @RequestParam double radius
+  ) {
+    List<HospitalDocument> hospitalDocuments =  hospitalService.searchNearBy(lat, lon, radius);
     return ResponseEntity.ok(hospitalDocuments);
   }
 
+  @Operation(summary = "search hospital with specialty", description = "진료 과목으로 병원을 검색합니다.")
   @GetMapping("/search/specialty-name")
-  public ResponseEntity<?> searchBySpecialtyNameES(@RequestParam String specialtyName) {
-    List<HospitalDocument> hospitalDocuments =  hospitalService.searchBySpecialtyNameES(specialtyName);
+  public ResponseEntity<?> searchBySpecialtyName(@Parameter(name = "specialtyName", description = "진료 과목 이름")
+                                                 @RequestParam String specialtyName
+  ) {
+    List<HospitalDocument> hospitalDocuments =  hospitalService.searchBySpecialtyName(specialtyName);
     return ResponseEntity.ok(hospitalDocuments);
   }
 
