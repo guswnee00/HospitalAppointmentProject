@@ -12,7 +12,7 @@ public class DataSyncScheduler {
 
   @Scheduled(cron = "0 0 * * * ?")
   public void scheduleForSynchronization() {
-    dataSyncService.syncAll();
+    dataSyncService.syncHospitals();
   }
 
 }
