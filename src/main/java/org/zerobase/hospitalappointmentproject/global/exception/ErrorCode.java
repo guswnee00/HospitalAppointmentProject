@@ -61,6 +61,9 @@ public enum ErrorCode {
   // hour, minute
   INVALID_TIME(HttpStatus.NOT_FOUND.value(), "올바르지 않은 시간 입력입니다."),
 
+  // sms
+  FAILED_TO_SEND_MESSAGE(HttpStatus.FAILED_DEPENDENCY.value(), "예약 문자 발송에 실패했습니다."),
+
   ;
 
   private final int statusCode;

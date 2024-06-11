@@ -20,10 +20,12 @@ import static org.zerobase.hospitalappointmentproject.global.exception.ErrorCode
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -44,7 +46,9 @@ import org.zerobase.hospitalappointmentproject.domain.staff.repository.StaffRepo
 import org.zerobase.hospitalappointmentproject.global.common.Hour;
 import org.zerobase.hospitalappointmentproject.global.common.Minute;
 import org.zerobase.hospitalappointmentproject.global.exception.CustomException;
+import org.zerobase.hospitalappointmentproject.global.sms.SmsService;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AppointmentService {
@@ -54,12 +58,15 @@ public class AppointmentService {
   private final HospitalRepository hospitalRepository;
   private final DoctorRepository doctorRepository;
   private final StaffRepository staffRepository;
+  private final SmsService smsService;
 
   /**
    * 환자의 병원 예약 생성
    *    1. 시와 분을 가져와서 유효한 시간인지 확인
    *    2. 해당 의사의 진료타임에 다른 예약이 없는지(타임당 1건) 확인
-   *    3. 예약 저장 후 dto 반환
+   *    3. 예약 저장
+   *    4. 예약 완료 문자 전송
+   *    5. dto 반환
    */
   @Transactional
   public AppointmentDto create(AppointmentCreate.Request request, String username) {
@@ -81,7 +88,24 @@ public class AppointmentService {
 
     AppointmentEntity appointment = appointmentRepository.save(AppointmentCreate.Request.toEntity(request, patient, hospital, doctor));
 
+    sendAppointmentSms(patient, appointment);
+
     return AppointmentDto.toDto(appointment);
+
+  }
+
+  private void sendAppointmentSms(PatientEntity patient, AppointmentEntity appointment) {
+
+    String date = appointment.getAppointmentDate().format(DateTimeFormatter.ofPattern("yyyy년 MM월 dd일"));
+    String time = appointment.getAppointmentTime().format(DateTimeFormatter.ofPattern("HH시 mm분"));
+    String message = String.format("%s님, %s %s %s선생님에 대한 진료 예약이 완료되었습니다.    -%s",
+                                    appointment.getPatient().getName(), date, time, appointment.getDoctor().getName(), appointment.getHospital().getName());
+
+    try {
+      smsService.sendSms(patient.getPhoneNumber(), message);
+    } catch (CustomException e) {
+      log.info("예약 문자 발송 실패");
+    }
 
   }
 
@@ -103,7 +127,8 @@ public class AppointmentService {
    *    1. 예약 상태가 '예약 대기' 상태인지 확인
    *    2. 유효한 예약 시간인지 확인
    *    3. 해당 의사의 진료타임에 다른 예약이 없는지(타임당 1건) 확인
-   *    4. 예약 변경 후 dto 반환
+   *    4. 예약 변경 문자 발송
+   *    5. dto 반환
    */
   @Transactional
   public AppointmentDto update(AppointmentUpdate.Request request, Long appointmentId, String username) {
@@ -137,6 +162,8 @@ public class AppointmentService {
     }
 
     AppointmentEntity updateAppointment = appointmentRepository.save(request.toUpdateEntity(appointment, hospital, doctor));
+
+    sendAppointmentSms(patient, appointment);
 
     return AppointmentDto.toDto(updateAppointment);
 
