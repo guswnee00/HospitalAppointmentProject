@@ -16,23 +16,20 @@ public class SmsService {
 
   private final DefaultMessageService messageService;
 
-  @Value("${sprint.coolsms.api.key}")
-  private String apiKey;
+  @Value("${spring.coolsms.from.phone-number}")
+  private String phoneNumber;
 
-  @Value("${sprint.coolsms.api.secret}")
-  private String apiSecret;
-
-  @Value("${sprint.coolsms.api.domain}")
-  private String apiDomain;
-
-  public SmsService() {
+  public SmsService(@Value("${spring.coolsms.api.key}") String apiKey,
+                    @Value("${spring.coolsms.api.secret}") String apiSecret,
+                    @Value("${spring.coolsms.api.domain}") String apiDomain
+  ) {
     this.messageService = NurigoApp.INSTANCE.initialize(apiKey, apiSecret, apiDomain);
   }
 
-  public void sendSms(String to, String from, String text) throws CustomException {
+  public void sendSms(String to, String text) throws CustomException {
 
     Message message = new Message();
-    message.setFrom(from);
+    message.setFrom(phoneNumber);
     message.setTo(to);
     message.setText(text);
 
