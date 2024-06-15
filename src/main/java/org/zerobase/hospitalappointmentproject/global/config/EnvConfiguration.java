@@ -4,7 +4,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 
 @Configuration
-@PropertySource("file:${PWD}/.env")
+@PropertySource("classpath:/env.properties")
 public class EnvConfiguration {
 
 }
