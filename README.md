@@ -8,12 +8,14 @@
 ## ⚙️ 개발 환경
 - Java 17
 - SpringBoot 3.2.5
-- gradle 8.7
-- Spring data JPA
+- Gradle 8.7
+- Spring Data JPA
 - Spring Security(JWT)
+- MySQL
+- Elasticsearch
+- CoolSMS API
 - Swagger 2.2.0
 - Ehcache 3.8.1
-- MySQL
 - Junit
 - Mockito
 - IntelliJ Idea
