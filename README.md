@@ -8,12 +8,14 @@
 ## ⚙️ 개발 환경
 - Java 17
 - SpringBoot 3.2.5
-- gradle 8.7
-- Spring data JPA
+- Gradle 8.7
+- Spring Data JPA
 - Spring Security(JWT)
+- MySQL
+- Elasticsearch
+- CoolSMS API
 - Swagger 2.2.0
 - Ehcache 3.8.1
-- MySQL
 - Junit
 - Mockito
 - IntelliJ Idea
@@ -22,8 +24,8 @@
 ## 🧩 프로젝트 기능 및 설계
 
 ### 회원 가입 및 로그인
-병원 검색을 제외한 기능을 이용하기 위해서는 회원가입과 로그인을 해야한다.   
-환자는 `ROLE_PATIENT`, 의사는 `ROLE_DOCTOR`, 병원 관계자는 `ROLE_STAFF`의 **PersonRole**을 가진다.
+- 병원 검색을 제외한 기능을 이용하기 위해서는 회원가입과 로그인을 해야한다.   
+- 환자는 `ROLE_PATIENT`, 의사는 `ROLE_DOCTOR`, 병원 관계자는 `ROLE_STAFF`의 **PersonRole**을 가진다.
 
 ### 환자 Patient
 - 환자는 본인의 개인 정보를 조회 / 수정 / 삭제할 수 있다.
